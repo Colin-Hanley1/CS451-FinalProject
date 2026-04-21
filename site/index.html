@@ -1,0 +1,2424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Prospect Almanac — A CS 451 Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+
+:root {
+  --paper:       #f2ead9;
+  --paper-hi:    #f8f1e1;
+  --paper-lo:    #e8dec8;
+  --ink:         #171411;
+  --ink-2:       #4a443b;
+  --ink-3:       #7a7266;
+  --rule:        #171411;
+  --hairline:    rgba(23,20,17,0.18);
+  --ox:          #a63818;
+  --ox-hi:       #c44a26;
+  --ox-deep:     #741d0b;
+  --navy:        #1f3a5c;
+  --sage:        #516b3e;
+  --red:         #8b2014;
+  --gold:        #b9862c;
+
+  --serif:  'Fraunces', 'Playfair Display', Georgia, serif;
+  --sans:   'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:   'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+
+  --measure: 1280px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern", "liga", "calt", "onum";
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(166,56,24,0.03), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(31,58,92,0.025), transparent 50%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.09  0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0.035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-attachment: fixed;
+}
+::selection { background: var(--ox); color: var(--paper-hi); }
+a { color: var(--ox); text-decoration: none; border-bottom: 1px solid var(--hairline); transition: border-color .15s, color .15s; }
+a:hover { color: var(--ox-deep); border-color: var(--ox); }
+
+.num, td.num, .mono { font-family: var(--mono); font-feature-settings: "tnum", "zero"; font-variant-numeric: tabular-nums; }
+
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 32px; }
+
+.masthead-frame {
+  border-bottom: 3px double var(--rule);
+  background: var(--paper-hi);
+}
+.supra {
+  border-bottom: 1px solid var(--hairline);
+  padding: 10px 32px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.supra .dot { color: var(--ox); }
+.supra-center { display: flex; gap: 18px; align-items: center; }
+.present-btn {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--paper-hi);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 5px 12px 6px;
+  cursor: pointer;
+  transition: background .12s, box-shadow .12s, transform .12s;
+}
+.present-btn:hover {
+  background: var(--ox);
+  border-color: var(--ox);
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: translate(-1px, -1px);
+}
+.present-btn .ox { color: var(--ox); }
+.present-btn:hover .ox { color: var(--paper-hi); }
+
+#slides-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--paper);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+}
+#slides-overlay.show { display: flex; }
+#slides-overlay iframe {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: var(--paper);
+}
+.present-exit {
+  position: fixed;
+  top: 16px; left: 20px;
+  z-index: 1002;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper-hi);
+  background: var(--ink);
+  border: 2px solid var(--ox);
+  padding: 6px 12px 7px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ox);
+}
+.present-exit:hover { background: var(--ox); border-color: var(--ink); }
+.present-hint {
+  position: fixed;
+  top: 18px; right: 20px;
+  z-index: 1002;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+
+.masthead {
+  padding: 28px 32px 24px;
+  max-width: var(--measure);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 40px;
+}
+.masthead .left, .masthead .right {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.masthead .right { text-align: right; }
+.masthead .left strong, .masthead .right strong { color: var(--ink); font-weight: 600; }
+
+.title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: italic;
+  font-stretch: 90%;
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--ink);
+  margin: 0;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+}
+.title .amp {
+  color: var(--ox);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+
+.tagline {
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: 10px 0;
+  margin: 10px auto 0;
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-2);
+  max-width: var(--measure);
+}
+
+.ticker-frame {
+  background: var(--ink);
+  color: var(--paper-hi);
+  border-bottom: 3px solid var(--ox);
+}
+.ticker {
+  padding: 10px 32px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  gap: 28px;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: var(--measure);
+  margin: 0 auto;
+  align-items: center;
+}
+.ticker .tk { display: inline-flex; gap: 8px; align-items: baseline; }
+.ticker .tk .k { color: #c7bea9; }
+.ticker .tk .v { color: var(--paper-hi); font-weight: 500; }
+.ticker .tk .v.up { color: #8ac97a; }
+.ticker .tk .v.dn { color: #f2836e; }
+.ticker .sep { color: var(--ox); }
+
+section { border-bottom: 1px solid var(--hairline); }
+.section-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 20px;
+  padding: 48px 0 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.section-head .no {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ox);
+  font-weight: 500;
+}
+.section-head h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: italic;
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1;
+  margin: 0;
+  letter-spacing: -0.01em;
+  font-variation-settings: "SOFT" 50;
+}
+.section-head .meta {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.section-body { padding: 28px 0 52px; }
+
+.lede {
+  padding: 64px 0 72px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 56px;
+  border-bottom: 1px solid var(--hairline);
+}
+.lede .copy { max-width: 56ch; }
+.dropcap::first-letter {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 5.4em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.1em 0.1em 0 0;
+  color: var(--ox);
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+.lede p {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 16px;
+  font-weight: 400;
+}
+.lede p.kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ox);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+
+.callout {
+  border: 1px solid var(--rule);
+  background: var(--paper-hi);
+  padding: 32px 28px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  box-shadow: 4px 4px 0 var(--rule);
+}
+.callout .big {
+  font-family: var(--serif);
+  font-size: 92px;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum", "zero";
+  font-variation-settings: "SOFT" 20;
+}
+.callout .big sup {
+  font-size: 28px;
+  color: var(--ox);
+  vertical-align: super;
+  font-style: italic;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-top: 1px solid var(--hairline);
+  padding-top: 10px;
+}
+.callout .row { display: flex; justify-content: space-between; gap: 24px; }
+.callout .row .cell { flex: 1; }
+.callout .row .cell .v {
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+  display: block;
+}
+.callout .row .cell .k {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+.grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.metrics-table caption {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+.metrics-table th, .metrics-table td {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--hairline);
+}
+.metrics-table th {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.metrics-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.metrics-table tr.lead td { color: var(--ink); font-weight: 500; }
+.metrics-table tr.lead td:first-child::after {
+  content: "◆";
+  color: var(--ox);
+  margin-left: 8px;
+  font-size: 10px;
+  vertical-align: middle;
+}
+.metrics-table .bar {
+  display: inline-block;
+  height: 6px;
+  background: var(--ox);
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+.feat-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 64px; }
+.feat-row {
+  display: grid;
+  grid-template-columns: 18px 1fr 60px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 13.5px;
+}
+.feat-row .rank { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+.feat-row .name { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+.feat-row .val { font-family: var(--mono); text-align: right; font-size: 12px; color: var(--ink); }
+.feat-row .track {
+  grid-column: 2 / 3;
+  height: 3px;
+  background: var(--paper-lo);
+  margin-top: 4px;
+  position: relative;
+}
+.feat-row .track > span {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--ox);
+}
+
+.scatter-wrap {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: stretch;
+}
+.scatter-card {
+  background: var(--paper-hi);
+  border: 1px solid var(--rule);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+.scatter-card .legend-bar {
+  display: flex;
+  gap: 18px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.scatter-card .legend-bar .cl { display: inline-flex; align-items: center; gap: 6px; }
+.scatter-card .legend-bar .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+#pca-canvas { display: block; width: 100%; }
+.scatter-tt {
+  position: absolute;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--paper-hi);
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.45;
+  border: 1px solid var(--ox);
+  opacity: 0;
+  transition: opacity .08s;
+  white-space: nowrap;
+  z-index: 5;
+}
+.scatter-side h4 {
+  font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-size: 24px; margin: 0 0 8px;
+}
+.scatter-side p { font-size: 13.5px; color: var(--ink-2); margin: 0 0 12px; line-height: 1.55; }
+.cluster-stat {
+  border: 1px solid var(--hairline);
+  padding: 14px;
+  margin-bottom: 12px;
+  background: var(--paper-hi);
+}
+.cluster-stat .cluster-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
+}
+.cluster-stat .cluster-head .sw { width: 12px; height: 12px; border-radius: 50%; }
+.cluster-stat .cluster-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px 14px; }
+.cluster-stat .cluster-body .kv .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-3); }
+.cluster-stat .cluster-body .kv .v { font-family: var(--mono); font-size: 14px; color: var(--ink); font-feature-settings: "tnum"; }
+
+.bb-top {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-bottom: 36px;
+}
+.bb-card {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 0;
+  padding: 20px 22px;
+  background: var(--paper-hi);
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition: box-shadow .12s, transform .12s;
+  position: relative;
+  overflow: hidden;
+}
+.bb-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--cluster-color, var(--ox));
+}
+.bb-card:hover { box-shadow: 4px 4px 0 var(--rule); transform: translate(-2px, -2px); }
+.bb-card .rnk {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 64px;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-weight: 500;
+  font-variation-settings: "SOFT" 60, "WONK" 1;
+  font-feature-settings: "tnum", "zero";
+}
+.bb-card .rnk-top10 { color: var(--ox); }
+.bb-card .body { padding-left: 4px; min-width: 0; }
+.bb-card .name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.01em;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bb-card .sub {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 4px 0 10px;
+}
+.bb-card .statline {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  line-height: 1.6;
+  font-feature-settings: "tnum";
+  white-space: normal;
+}
+.bb-card .statline .sep { color: var(--ink-3); margin: 0 6px; }
+.bb-card .pred {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 90px;
+  border-left: 1px solid var(--hairline);
+  padding-left: 18px;
+}
+.bb-card .pred .v {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+  line-height: 1;
+}
+.bb-card .pred .v.up { color: var(--ox); }
+.bb-card .pred .k {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+.bb-card .pred .prob {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  margin-top: 6px;
+}
+
+.bb-rest-wrap { border-top: 1.5px solid var(--rule); padding-top: 20px; }
+.bb-rest-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+.bb-rest { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; }
+.bb-rest .row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 9px 4px;
+  border-bottom: 1px dotted var(--hairline);
+  cursor: pointer;
+}
+.bb-rest .row:hover { background: var(--paper-lo); }
+.bb-rest .row .rnk { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.bb-rest .row .name { font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.bb-rest .row .name .meta { color: var(--ink-3); font-family: var(--mono); font-size: 10.5px; font-weight: 400; margin-left: 4px; }
+.bb-rest .row .pred { font-family: var(--mono); font-size: 13px; color: var(--ink); font-feature-settings: "tnum"; }
+.bb-rest .row .pred .prob { color: var(--ink-3); font-size: 10.5px; margin-left: 6px; }
+
+@media (max-width: 960px) {
+  .bb-top { grid-template-columns: 1fr; }
+  .bb-rest { grid-template-columns: 1fr; }
+  .bb-card { grid-template-columns: 60px 1fr auto; }
+  .bb-card .rnk { font-size: 44px; }
+  .bb-card .name { font-size: 19px; }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 0 18px;
+  border-bottom: 2px solid var(--rule);
+  margin-bottom: 0;
+}
+.filters label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.filters input[type=search],
+.filters select {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  background: var(--paper-hi);
+  border: 1px solid var(--rule);
+  padding: 6px 10px;
+  outline: none;
+  border-radius: 0;
+}
+.filters input[type=search]:focus,
+.filters select:focus { border-color: var(--ox); box-shadow: 2px 2px 0 var(--ox); }
+.filters .count {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-left: auto;
+}
+
+details.collapsible-table { margin-top: 8px; }
+details.collapsible-table > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  background: var(--paper-hi);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: background .12s, box-shadow .12s, transform .12s;
+}
+details.collapsible-table > summary::-webkit-details-marker { display: none; }
+details.collapsible-table > summary:hover {
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--rule);
+  transform: translate(-1px, -1px);
+}
+details.collapsible-table > summary .lead {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--ink);
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+}
+details.collapsible-table > summary .chev {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-right: 2px solid var(--ox);
+  border-bottom: 2px solid var(--ox);
+  transform: rotate(45deg);
+  margin-left: 6px;
+  transition: transform .2s ease;
+  position: relative; top: -2px;
+}
+details.collapsible-table[open] > summary .chev { transform: rotate(-135deg); top: 2px; }
+details.collapsible-table[open] > summary {
+  border-bottom-width: 0;
+  margin-bottom: 0;
+}
+details.collapsible-table[open] > summary .cta { color: var(--ox); }
+
+.ptable-scroll { overflow-x: auto; }
+table.ptable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.ptable thead th {
+  position: sticky; top: 0;
+  background: var(--paper);
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: right;
+  padding: 10px 8px;
+  border-bottom: 1.5px solid var(--rule);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+table.ptable thead th:first-child,
+table.ptable thead th.txt { text-align: left; }
+table.ptable thead th.sorted { color: var(--ox); }
+table.ptable thead th .caret { display: inline-block; margin-left: 4px; opacity: 0.6; }
+table.ptable tbody tr {
+  border-bottom: 1px solid var(--hairline);
+  cursor: pointer;
+  transition: background .08s;
+}
+table.ptable tbody tr:hover { background: var(--paper-lo); }
+table.ptable tbody td {
+  padding: 9px 8px;
+  text-align: right;
+  font-family: var(--mono);
+  font-feature-settings: "tnum", "zero";
+  color: var(--ink);
+  white-space: nowrap;
+}
+table.ptable tbody td.name {
+  text-align: left;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+table.ptable tbody td.name .meta {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.posvorp-bar {
+  display: inline-block;
+  width: 42px;
+  height: 5px;
+  background: var(--paper-lo);
+  vertical-align: middle;
+  margin-right: 6px;
+  position: relative;
+}
+.posvorp-bar > span {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--ox);
+}
+.delta-pos { color: var(--sage); }
+.delta-neg { color: var(--red); }
+.pill {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid var(--hairline);
+  color: var(--ink-2);
+  border-radius: 0;
+}
+.pill.test { border-color: var(--ox); color: var(--ox); }
+.cluster-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(23,20,17,0.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 90;
+}
+.drawer-overlay.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(560px, 100vw);
+  background: var(--paper);
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform .25s cubic-bezier(0.4, 0.0, 0.2, 1);
+  box-shadow: -2px 0 20px rgba(23,20,17,0.15);
+  overflow-y: auto;
+  border-left: 3px double var(--rule);
+}
+.drawer.show { transform: translateX(0); }
+.drawer-head {
+  padding: 20px 28px;
+  border-bottom: 3px double var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  position: sticky; top: 0;
+  background: var(--paper-hi);
+  z-index: 2;
+}
+.drawer-head .player-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 1.05;
+  margin: 0;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+}
+.drawer-head .player-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+.drawer-close {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 6px 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.drawer-close:hover { background: var(--ink); color: var(--paper-hi); }
+
+.drawer-body { padding: 24px 28px 40px; }
+.drawer-section { margin-bottom: 32px; }
+.drawer-section h5 {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 500;
+}
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px 14px; }
+.stat-grid .kv { padding: 6px 0; border-bottom: 1px dotted var(--hairline); }
+.stat-grid .kv .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.stat-grid .kv .v { font-family: var(--mono); font-size: 16px; color: var(--ink); font-feature-settings: "tnum"; }
+
+.big-predict {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 20px;
+  background: var(--paper-hi);
+  border: 1px solid var(--rule);
+}
+.big-predict .col { text-align: center; flex: 1; }
+.big-predict .col .v {
+  font-family: var(--serif);
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+}
+.big-predict .col.pred .v { color: var(--ox); }
+.big-predict .col .k {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-3); margin-top: 4px;
+}
+.big-predict .col .sub { font-family: var(--mono); font-size: 11px; color: var(--ink-2); margin-top: 4px; }
+
+.shap-row { display: grid; grid-template-columns: 160px 1fr 60px; gap: 10px; align-items: center; padding: 5px 0; font-size: 12.5px; }
+.shap-row .name { font-family: var(--mono); font-size: 11.5px; color: var(--ink); }
+.shap-row .track {
+  height: 14px; position: relative; background: var(--paper-lo);
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+}
+.shap-row .track .mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--rule); }
+.shap-row .track .bar { position: absolute; top: 0; bottom: 0; background: var(--ox); }
+.shap-row .track .bar.neg { background: var(--navy); }
+.shap-row .val { font-family: var(--mono); font-size: 11.5px; text-align: right; color: var(--ink); }
+
+.comps-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.comps-table th, .comps-table td {
+  text-align: left; padding: 7px 6px; border-bottom: 1px dotted var(--hairline);
+}
+.comps-table th {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); font-weight: 500;
+}
+.comps-table td { font-family: var(--mono); font-size: 12px; }
+.comps-table td.name { font-family: var(--sans); font-weight: 500; }
+.comps-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.predictor-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.predictor-note {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 52ch;
+  font-family: var(--serif);
+  font-style: italic;
+}
+.predictor-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+.predictor-form .full { grid-column: 1 / -1; }
+.slider {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+}
+.slider .lbl {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.slider .val { font-family: var(--mono); font-size: 13px; color: var(--ox); font-feature-settings: "tnum"; }
+.slider input[type=range] {
+  grid-column: 1 / -1;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  margin: 2px 0 2px;
+}
+.slider input[type=range]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--rule);
+}
+.slider input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px; height: 14px;
+  background: var(--ox);
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  margin-top: -6px;
+  cursor: pointer;
+}
+.slider input[type=range]::-moz-range-track { height: 2px; background: var(--rule); }
+.slider input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  background: var(--ox);
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.seg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.seg input[type=radio] { display: none; }
+.seg label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 8px 4px;
+  border: 1px solid var(--rule);
+  margin-left: -1px;
+  background: var(--paper-hi);
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.seg label:first-of-type { margin-left: 0; }
+.seg input[type=radio]:checked + label {
+  background: var(--ink);
+  color: var(--paper-hi);
+  border-color: var(--ink);
+}
+
+.predictor-out {
+  border: 1px solid var(--rule);
+  background: var(--paper-hi);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 4px 4px 0 var(--rule);
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
+}
+.predictor-out h4 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.predictor-out .big {
+  font-family: var(--serif);
+  font-size: 92px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+}
+.predictor-out .big .unit {
+  font-family: var(--mono);
+  font-size: 16px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ox);
+  vertical-align: top;
+  margin-left: 4px;
+  font-weight: 500;
+}
+.verdict {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--ink);
+  line-height: 1.35;
+  border-left: 3px solid var(--ox);
+  padding-left: 14px;
+}
+.predictor-out .breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 20px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 16px;
+}
+.predictor-out .breakdown .k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.predictor-out .breakdown .v { font-family: var(--mono); font-size: 14px; color: var(--ink); text-align: right; }
+
+.colophon {
+  padding: 48px 0 64px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+  border-top: 3px double var(--rule);
+}
+.colophon h6 {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+  font-weight: 500;
+}
+.colophon p { font-size: 13.5px; color: var(--ink-2); margin: 0 0 8px; line-height: 1.55; }
+
+.loading {
+  display: flex; justify-content: center; align-items: center;
+  padding: 120px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.loading::before {
+  content: "";
+  display: inline-block;
+  width: 10px; height: 10px;
+  background: var(--ox);
+  margin-right: 12px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+@media (max-width: 960px) {
+  .wrap { padding: 0 20px; }
+  .masthead { grid-template-columns: 1fr; text-align: center; gap: 12px; }
+  .masthead .right, .masthead .left { text-align: center; }
+  .lede { grid-template-columns: 1fr; gap: 36px; padding: 40px 0; }
+  .grid-split { grid-template-columns: 1fr; gap: 40px; }
+  .scatter-wrap { grid-template-columns: 1fr; gap: 20px; }
+  .predictor-wrap { grid-template-columns: 1fr; }
+  .predictor-out { position: static; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .feat-list { grid-template-columns: 1fr; gap: 0 20px; }
+  .cluster-stat .cluster-body { grid-template-columns: 1fr 1fr; }
+  .colophon { grid-template-columns: 1fr; gap: 24px; }
+  .callout .big { font-size: 62px; }
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .7s ease both; }
+.rise.d1 { animation-delay: .06s; }
+.rise.d2 { animation-delay: .14s; }
+.rise.d3 { animation-delay: .24s; }
+
+</style>
+</head>
+<body>
+
+<div class="masthead-frame">
+  <div class="supra">
+    <span>EST. 2026 &nbsp;·&nbsp; A CS 451 DATA SCIENCE STUDY</span>
+    <span class="supra-center">
+      <button type="button" class="present-btn" id="present-open">
+        ▸ <span class="ox">Present</span> &nbsp;slides
+      </button>
+    </span>
+    <span id="today-date" class="mono"></span>
+  </div>
+  <header class="masthead">
+    <div class="left rise">
+      <strong>VOLUME I</strong><br />
+      NUMBER ONE<br />
+      PAPER EDITION
+    </div>
+    <div class="center rise d1">
+      <h1 class="title">The Prospect<span class="amp"> &amp; </span>Almanac</h1>
+      <div class="tagline">
+        &mdash; projecting four-year NBA value from college statistics, recruiting profiles,
+        and a tree of shallow boosted decisions, from the draft classes of 2000 to 2022 &mdash;
+      </div>
+    </div>
+    <div class="right rise d2">
+      <strong>EDITOR</strong><br />
+      Colin Hanley<br />
+      CS 451
+    </div>
+  </header>
+</div>
+
+<div class="ticker-frame">
+  <div class="ticker" id="ticker">
+    <span class="tk"><span class="k">OBS</span> <span class="v" id="tk-n">—</span></span>
+    <span class="sep">◆</span>
+    <span class="tk"><span class="k">TRAIN</span> <span class="v" id="tk-train">—</span></span>
+    <span class="tk"><span class="k">TEST</span> <span class="v" id="tk-test">—</span></span>
+    <span class="sep">◆</span>
+    <span class="tk"><span class="k">FEAT</span> <span class="v" id="tk-feat">—</span></span>
+    <span class="sep">◆</span>
+    <span class="tk"><span class="k">XGB R²</span> <span class="v up" id="tk-r2">—</span></span>
+    <span class="tk"><span class="k">MAE</span> <span class="v" id="tk-mae">—</span></span>
+    <span class="tk"><span class="k">AUC</span> <span class="v" id="tk-auc">—</span></span>
+    <span class="sep">◆</span>
+    <span class="tk"><span class="k">SPLIT</span> <span class="v" id="tk-split">—</span></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+
+
+
+  <section class="lede">
+    <div class="copy rise">
+      <p class="kicker">FROM THE EDITOR &nbsp;·&nbsp; A NOTE ON METHOD</p>
+      <p class="dropcap">
+        Every June a thousand scouts, executives, and coaches convene to guess which
+        twenty-year-olds will become professional basketball players. They watch tape,
+        they read measurements, they argue about motor. This study asks a narrower and
+        more tractable question: given only what a prospect did in college &mdash; and what he was
+        thought of in high school &mdash; how much of his four-year NBA value can be recovered
+        by a machine?
+      </p>
+      <p>
+        The answer, for now, is modest. A gradient-boosted tree explains about a fifth of
+        the variance in four-year VORP out of sample. The remaining four-fifths is the
+        reason teams still hire scouts. What follows is an accounting of what the model
+        saw, where it agreed with history, and where it dissents.
+      </p>
+    </div>
+    <aside class="callout rise d1" id="callout-card">
+      <div>
+        <div class="big" id="callout-big">—<sup>R²</sup></div>
+        <div class="label">Best test R² &nbsp;·&nbsp; XGBoost regressor</div>
+      </div>
+      <div class="row">
+        <div class="cell">
+          <span class="v" id="callout-mae">—</span>
+          <span class="k">MAE (VORP)</span>
+        </div>
+        <div class="cell">
+          <span class="v" id="callout-auc">—</span>
+          <span class="k">AUC · Positive-VORP classifier</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="cell">
+          <span class="v" id="callout-n">—</span>
+          <span class="k">Players analyzed</span>
+        </div>
+        <div class="cell">
+          <span class="v" id="callout-years">—</span>
+          <span class="k">Draft classes</span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+
+
+
+  <section>
+    <div class="section-head">
+      <span class="no">§ I</span>
+      <h2>Build a Prospect</h2>
+      <span class="meta">LIVE · RIDGE COEFFICIENTS</span>
+    </div>
+    <div class="section-body predictor-wrap">
+      <div>
+        <p class="predictor-note">
+          The Ridge model is interpretable enough that we can ship its weights to your browser
+          and let you drive the inputs yourself. Move the sliders; the prediction updates
+          immediately. Stats you don't specify are held at the dataset mean.
+        </p>
+
+        <form class="predictor-form" id="predictor-form" autocomplete="off" onsubmit="return false">
+          <div class="full">
+            <div class="lbl" style="margin-bottom:6px">Position</div>
+            <div class="seg">
+              <input type="radio" name="pred-pos" id="pos-g" value="Guard" checked />
+              <label for="pos-g">Guard</label>
+              <input type="radio" name="pred-pos" id="pos-f" value="Forward" />
+              <label for="pos-f">Forward</label>
+              <input type="radio" name="pred-pos" id="pos-c" value="Center" />
+              <label for="pos-c">Center</label>
+            </div>
+          </div>
+
+          <div class="slider" data-key="ppg" data-min="0" data-max="30" data-step="0.1" data-default="13">
+            <span class="lbl">Points / game</span>
+            <span class="val">13.0</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="rpg" data-min="0" data-max="15" data-step="0.1" data-default="5.5">
+            <span class="lbl">Rebounds / game</span>
+            <span class="val">5.5</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="apg" data-min="0" data-max="10" data-step="0.1" data-default="2.2">
+            <span class="lbl">Assists / game</span>
+            <span class="val">2.2</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="spg" data-min="0" data-max="3.5" data-step="0.05" data-default="1.0">
+            <span class="lbl">Steals / game</span>
+            <span class="val">1.0</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="bpg" data-min="0" data-max="5" data-step="0.05" data-default="0.8">
+            <span class="lbl">Blocks / game</span>
+            <span class="val">0.8</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="ts_pct" data-min="0.40" data-max="0.72" data-step="0.005" data-default="0.567">
+            <span class="lbl">TS% (shooting eff.)</span>
+            <span class="val">0.567</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="ws_40" data-min="-0.05" data-max="0.40" data-step="0.005" data-default="0.178">
+            <span class="lbl">Win Shares / 40</span>
+            <span class="val">0.178</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="three_pt_attempt_rate" data-min="0" data-max="0.90" data-step="0.01" data-default="0.26">
+            <span class="lbl">3-pt attempt rate</span>
+            <span class="val">0.26</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="three_pt_pct" data-min="0" data-max="0.60" data-step="0.005" data-default="0.33">
+            <span class="lbl">3-pt % (raw)</span>
+            <span class="val">0.330</span>
+            <input type="range" />
+          </div>
+          <div class="slider" data-key="recruit_rank" data-min="1" data-max="101" data-step="1" data-default="64">
+            <span class="lbl">Recruit rank (1=best, 101=unrkd)</span>
+            <span class="val">64</span>
+            <input type="range" />
+          </div>
+          <div class="slider full" data-key="college_seasons" data-min="1" data-max="4" data-step="1" data-default="3">
+            <span class="lbl">College seasons</span>
+            <span class="val">3</span>
+            <input type="range" />
+          </div>
+        </form>
+      </div>
+
+      <aside class="predictor-out" id="predictor-out">
+        <h4>Projected 4-year NBA VORP</h4>
+        <div>
+          <div class="big" id="pred-vorp">—<span class="unit">VORP</span></div>
+        </div>
+        <div class="verdict" id="pred-verdict">Adjust a slider to see the model's verdict.</div>
+        <div class="breakdown">
+          <span class="k">Percentile · all drafted</span> <span class="v" id="pred-pct">—</span>
+          <span class="k">P(positive VORP) · linear</span> <span class="v" id="pred-prob">—</span>
+          <span class="k">Nearest archetype</span> <span class="v" id="pred-arch">—</span>
+          <span class="k">Implied NBA seasons</span> <span class="v" id="pred-seasons">—</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+
+
+
+  <section id="bigboard-section" hidden>
+    <div class="section-head">
+      <span class="no">§ II</span>
+      <h2>The 2026 Big Board</h2>
+      <span class="meta" id="bb-meta">—</span>
+    </div>
+    <div class="section-body">
+      <p class="predictor-note" style="max-width:72ch; margin-bottom: 28px">
+        A top-to-bottom ranking of the incoming draft class, with each prospect's
+        four-year VORP projected by the XGBoost model trained on 2000&ndash;2018 and
+        validated on 2019&ndash;2022. The top ten are shown in full below. Click any
+        entry for the dossier &mdash; stat profile, SHAP drivers, and the five most
+        similar historical draftees.
+      </p>
+      <div class="bb-top" id="bb-top"></div>
+      <div class="bb-rest-wrap">
+        <div class="bb-rest-head">
+          <span>RANKS 11 &mdash; END &nbsp;·&nbsp; compact list</span>
+          <span id="bb-rest-count"></span>
+        </div>
+        <div class="bb-rest" id="bb-rest"></div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <section>
+    <div class="section-head">
+      <span class="no">§ III</span>
+      <h2>The Models, on Trial</h2>
+      <span class="meta">TEMPORAL SPLIT · TRAIN 2000–2018 · TEST 2019–2022</span>
+    </div>
+    <div class="section-body grid-split">
+      <div>
+        <table class="metrics-table" id="reg-table">
+          <caption>Regression — predicting 4-year VORP</caption>
+          <thead>
+            <tr><th>Model</th><th>R²</th><th>MAE</th><th>RMSE</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <br />
+        <table class="metrics-table" id="cls-table">
+          <caption>Classification — predicting <em>positive</em> 4-year VORP</caption>
+          <thead>
+            <tr><th>Model</th><th>Accuracy</th><th>F1</th><th>AUC</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <p class="predictor-note" style="margin-bottom: 16px">
+          Three estimators were set against one another: a plain Ridge regression for its
+          interpretability, a randomly-searched XGBoost for its raw accuracy, and a shallow
+          MLP for its ability to fit non-linearities we haven't named. The boosted trees
+          win &mdash; narrowly &mdash; on every metric that matters. Below, the coefficients and
+          gain-based importances they each settled on.
+        </p>
+
+        <h5 style="font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--hairline);">XGBoost · Top 15 by gain</h5>
+        <div class="feat-list" id="feat-importance"></div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <section>
+    <div class="section-head">
+      <span class="no">§ IV</span>
+      <h2>The Archetypes</h2>
+      <span class="meta">K-MEANS · PCA PROJECTION · HOVER TO NAME</span>
+    </div>
+    <div class="section-body">
+      <div class="scatter-wrap">
+        <div class="scatter-card">
+          <div class="legend-bar">
+            <span>Principal Components I (horiz.) × II (vert.)</span>
+            <span id="scatter-legend"></span>
+          </div>
+          <canvas id="pca-canvas" height="560"></canvas>
+          <div class="scatter-tt" id="scatter-tt"></div>
+        </div>
+        <div class="scatter-side">
+          <h4>What the clusters actually are.</h4>
+          <p>
+            The unsupervised k-means doesn't know anything about NBA outcomes; it only
+            sees the college-era features. At this resolution it carves the draft pool
+            into a handful of recognizable basketball types, each with its own mean
+            four-year value. Archetype names are derived on the fly from whichever stats
+            most distinguish the cluster.
+          </p>
+          <div id="cluster-profiles"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <section>
+    <div class="section-head">
+      <span class="no">§ V</span>
+      <h2>The Prospects &mdash; <em>an index of all 1,042</em></h2>
+      <span class="meta">CLICK ROW FOR DOSSIER</span>
+    </div>
+    <div class="section-body">
+      <details class="collapsible-table" id="prospects-details">
+        <summary>
+          <span class="lead">Expand the index &mdash; all 1,042 drafted players, 2000&ndash;2022</span>
+          <span><span class="cta">Browse</span> <span class="chev"></span></span>
+        </summary>
+        <div class="filters">
+          <input id="f-search" type="search" placeholder="Search name or college…" />
+          <label>Position
+            <select id="f-pos">
+              <option value="">All</option>
+              <option>Guard</option>
+              <option>Forward</option>
+              <option>Center</option>
+            </select>
+          </label>
+          <label>Year
+            <select id="f-year"><option value="">All</option></select>
+          </label>
+          <label>Split
+            <select id="f-split">
+              <option value="">All</option>
+              <option value="train">Train (&lt;2019)</option>
+              <option value="test">Test (≥2019)</option>
+            </select>
+          </label>
+          <label>Archetype
+            <select id="f-cluster">
+              <option value="">All</option>
+            </select>
+          </label>
+          <span class="count" id="f-count">—</span>
+        </div>
+        <div class="ptable-scroll">
+          <table class="ptable" id="ptable">
+            <thead>
+              <tr>
+                <th class="txt" data-sort="player_name">Player <span class="caret"></span></th>
+                <th class="txt" data-sort="college">College <span class="caret"></span></th>
+                <th data-sort="draft_year">Yr <span class="caret"></span></th>
+                <th data-sort="position">Pos <span class="caret"></span></th>
+                <th data-sort="ppg">PPG <span class="caret"></span></th>
+                <th data-sort="rpg">RPG <span class="caret"></span></th>
+                <th data-sort="apg">APG <span class="caret"></span></th>
+                <th data-sort="ts_pct">TS% <span class="caret"></span></th>
+                <th data-sort="ws_40">WS/40 <span class="caret"></span></th>
+                <th data-sort="recruit_rank">Rec <span class="caret"></span></th>
+                <th data-sort="actual_vorp">Act. VORP <span class="caret"></span></th>
+                <th data-sort="predicted_vorp" class="sorted">Pred. VORP ▼</th>
+                <th data-sort="posvorp_prob">P(VORP+) <span class="caret"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+
+
+
+  <section class="colophon">
+    <div>
+      <h6>Sources</h6>
+      <p>Basketball-Reference.com — NBA draft history, college career totals, advanced
+        metrics, four-year NBA outcomes.</p>
+      <p>247Sports composite — high school recruiting rankings and grades.</p>
+    </div>
+    <div>
+      <h6>Method</h6>
+      <p>Temporal train/test split at 2019. Features engineered: position-relative z-scores,
+        interactions, and a volume-weighted three-point percentage that shrinks
+        low-attempt players toward the league mean.</p>
+      <p>Models: XGBoost (best), Ridge (interpretable), MLP (comparison).</p>
+    </div>
+    <div>
+      <h6>Set in</h6>
+      <p><em>Fraunces</em> (display) and <em>IBM Plex Sans / Mono</em> (text and figures).</p>
+      <p>All predictions generated by the exported Ridge coefficients, executed entirely
+         in the reader's browser.</p>
+    </div>
+  </section>
+</main>
+
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <h3 class="player-name" id="d-name">—</h3>
+      <div class="player-meta" id="d-meta">—</div>
+    </div>
+    <button class="drawer-close" id="drawer-close">Close ✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<div id="slides-overlay" aria-hidden="true">
+  <iframe id="slides-frame" title="Project Slides"></iframe>
+</div>
+<button type="button" class="present-exit" id="present-exit" style="display:none"
+  title="Return to the demo (Esc)">✕ &nbsp;Back to demo</button>
+<div class="present-hint" id="present-hint" style="display:none">← → to navigate &middot; Esc to exit</div>
+
+<div class="loading" id="loading">Loading almanac data</div>
+
+<script>
+
+const FEATURE_PRETTY = {
+  ws_40: "Win Shares / 40", ws_40_vs_pos: "WS/40 (pos-rel.)",
+  ppg: "Points / game", ppg_vs_pos: "PPG (pos-rel.)",
+  rpg: "Rebounds / game", rpg_vs_pos: "RPG (pos-rel.)",
+  apg: "Assists / game", apg_vs_pos: "APG (pos-rel.)",
+  spg: "Steals / game", spg_vs_pos: "SPG (pos-rel.)",
+  bpg: "Blocks / game", bpg_vs_pos: "BPG (pos-rel.)",
+  ts_pct: "True-shooting %", ts_pct_vs_pos: "TS% (pos-rel.)",
+  fg_pct: "Field-goal %", efg_pct: "Effective FG%", ft_pct: "Free-throw %",
+  two_pt_pct: "2-pt %", three_pt_pct_vw: "3-pt % (vol-weighted)",
+  three_pt_attempt_rate: "3-pt attempt rate",
+  tov_pct: "Turnover %", ftr: "Free-throw rate",
+  topg: "Turnovers / game", fpg: "Fouls / game", mpg: "Minutes / game",
+  ws: "Win Shares", ows: "Off. Win Shares", dws: "Def. Win Shares",
+  ws40_per_season: "WS/40 ÷ seasons",
+  def_versatility: "Defensive versatility (S × B)",
+  recruit_x_ws40: "Recruit × WS/40",
+  build_score: "Build score",
+  height_inches: "Height (in)", height_inches_vs_pos: "Height (pos-rel.)",
+  weight_lbs: "Weight (lb)", weight_lbs_vs_pos: "Weight (pos-rel.)",
+  college_seasons: "College seasons",
+  one_and_done: "One-and-done",
+  recruit_rank: "Recruit rank",
+  is_top_100_recruit: "Top-100 recruit",
+  is_top_10_recruit: "Top-10 recruit",
+};
+
+const COLORS = { ink: "#171411", paper: "#f2ead9" };
+const CLUSTER_PALETTE = ["#a63818", "#1f3a5c", "#516b3e", "#b9862c", "#2d6e73", "#6a2e52", "#4a4a5a", "#8b2014"];
+const clusterColor = id => CLUSTER_PALETTE[Number(id) % CLUSTER_PALETTE.length];
+
+const ARCHETYPE_DIMS = [
+  { k: "ws_40",  hi: "High-impact",     lo: "",              hi_abs: 0.20, lo_abs: null  },
+  { k: "ppg",    hi: "Scoring",         lo: "Low-usage",     hi_abs: null, lo_abs: 9.0   },
+  { k: "apg",    hi: "Playmaking",      lo: "",              hi_abs: 3.0,  lo_abs: null  },
+  { k: "rpg",    hi: "Glass-crashing",  lo: "",              hi_abs: 6.5,  lo_abs: null  },
+  { k: "spg",    hi: "Disruptive",      lo: "",              hi_abs: 1.3,  lo_abs: null  },
+  { k: "bpg",    hi: "Rim-protecting",  lo: "",              hi_abs: 1.0,  lo_abs: null  },
+  { k: "ts_pct", hi: "Efficient",       lo: "Inefficient",   hi_abs: 0.57, lo_abs: 0.50  },
+];
+
+function archetypeName (profile, siblings) {
+
+  const weightedMean = (k) => {
+    const N = siblings.reduce((s, p) => s + p.count, 0);
+    return N ? siblings.reduce((s, p) => s + p[k] * p.count, 0) / N : 0;
+  };
+  const weightedStd = (k, mu) => {
+    const N = siblings.reduce((s, p) => s + p.count, 0);
+    const v = N ? siblings.reduce((s, p) => s + p.count * (p[k] - mu) ** 2, 0) / N : 0;
+    return Math.sqrt(Math.max(v, 1e-9));
+  };
+  const scored = ARCHETYPE_DIMS.map(d => {
+    const mu = weightedMean(d.k);
+    const sd = weightedStd(d.k, mu);
+    const z = sd > 0 ? (profile[d.k] - mu) / sd : 0;
+    return { ...d, z };
+  });
+
+
+
+
+
+
+  const hiCandidates = scored.filter(r => r.hi && r.hi.trim())
+    .filter(r => {
+      if (r.hi_abs == null) return r.z > 0.7;
+      if (profile[r.k] >= r.hi_abs * 1.3) return true;
+      return r.z > 0 && profile[r.k] >= r.hi_abs;
+    });
+
+
+
+  const loCandidates = scored.filter(r => r.lo && r.lo.trim())
+    .filter(r => r.z < -1.0 && r.lo_abs != null && profile[r.k] < r.lo_abs);
+
+  hiCandidates.sort((a, b) => b.z - a.z);
+  loCandidates.sort((a, b) => a.z - b.z);
+
+  const posNoun = (profile.position || "player").toLowerCase();
+  if (hiCandidates[0]) return `${hiCandidates[0].hi} ${posNoun}`;
+  if (loCandidates[0]) return `${loCandidates[0].lo} ${posNoun}`;
+  return `Traditional ${posNoun}`;
+}
+
+const state = {
+  meta: null,
+  prospects: [],
+  clusters: null,
+  posStats: null,
+  filtered: [],
+  sortKey: "predicted_vorp",
+  sortDir: -1,
+};
+
+const optional = (path) => fetch(path).then(r => r.ok ? r.json() : null).catch(() => null);
+Promise.all([
+  fetch("data/prospects.json").then(r => r.json()),
+  fetch("data/model_meta.json").then(r => r.json()),
+  fetch("data/clusters.json").then(r => r.json()),
+  fetch("data/position_stats.json").then(r => r.json()),
+  optional("data/bigboard.json"),
+]).then(([prospects, meta, clusters, posStats, bigboard]) => {
+  state.prospects = prospects;
+  state.meta = meta;
+  state.clusters = clusters;
+  state.posStats = posStats;
+  state.bigboard = bigboard || [];
+  init();
+  document.getElementById("loading").remove();
+}).catch(err => {
+  document.getElementById("loading").textContent = "Failed to load data — " + err.message;
+  console.error(err);
+});
+
+function init () {
+  setDate();
+  hydrateTicker();
+  hydrateCallout();
+  renderMetricsTables();
+  renderFeatureImportance();
+  renderClusterProfiles();
+  renderBigBoard();
+  renderScatter();
+  populateFilterYears();
+  bindFilters();
+  bindSorts();
+  applyFiltersAndRender();
+  initPredictor();
+  bindDrawer();
+  bindPresent();
+}
+
+function bindPresent () {
+  const overlay = document.getElementById("slides-overlay");
+  const frame   = document.getElementById("slides-frame");
+  const exit    = document.getElementById("present-exit");
+  const hint    = document.getElementById("present-hint");
+  const openBtn = document.getElementById("present-open");
+
+  let loaded = false;
+  function open () {
+    if (!loaded) { frame.src = "slides.html"; loaded = true; }
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+    exit.style.display = "block";
+    hint.style.display = "block";
+    document.body.style.overflow = "hidden";
+
+    setTimeout(() => { try { frame.contentWindow.focus(); } catch (e) {} }, 50);
+  }
+  function close () {
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+    exit.style.display = "none";
+    hint.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  openBtn.addEventListener("click", open);
+  exit.addEventListener("click", close);
+
+
+  window.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("show")) close();
+  });
+
+  window.addEventListener("message", e => {
+    if (e.data === "slides:exit") close();
+  });
+}
+
+const fmt = (v, d = 2) => (v == null || isNaN(v)) ? "—" : Number(v).toFixed(d);
+const fmtSigned = (v, d = 2) => {
+  if (v == null || isNaN(v)) return "—";
+  const n = Number(v).toFixed(d);
+  return v >= 0 ? `+${n}` : n;
+};
+const fmtPct = v => (v == null || isNaN(v)) ? "—" : (v * 100).toFixed(1) + "%";
+
+function setDate () {
+  const d = new Date();
+  const fmtd = d.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  document.getElementById("today-date").textContent = fmtd.toUpperCase();
+}
+
+function hydrateTicker () {
+  const m = state.meta;
+  const xgb = m.regression_results["XGBoost"];
+  const xgbC = m.classification_results["XGBoost"];
+  document.getElementById("tk-n").textContent = m.n_training + m.n_test;
+  document.getElementById("tk-train").textContent = m.n_training;
+  document.getElementById("tk-test").textContent = m.n_test;
+  document.getElementById("tk-feat").textContent = m.n_features;
+  document.getElementById("tk-r2").textContent = "+" + xgb.r2.toFixed(3);
+  document.getElementById("tk-mae").textContent = xgb.mae.toFixed(2);
+  document.getElementById("tk-auc").textContent = xgbC.auc_roc.toFixed(3);
+  document.getElementById("tk-split").textContent = m.split_year;
+}
+
+function hydrateCallout () {
+  const m = state.meta;
+  const xgb = m.regression_results["XGBoost"];
+  const xgbC = m.classification_results["XGBoost"];
+  document.getElementById("callout-big").innerHTML = xgb.r2.toFixed(3).replace(/^0/, "·") + '<sup>R²</sup>';
+  document.getElementById("callout-mae").textContent = xgb.mae.toFixed(2);
+  document.getElementById("callout-auc").textContent = xgbC.auc_roc.toFixed(3);
+  document.getElementById("callout-n").textContent = (m.n_training + m.n_test).toLocaleString();
+  const yrs = new Set(state.prospects.map(p => p.draft_year));
+  document.getElementById("callout-years").textContent = yrs.size;
+}
+
+function renderMetricsTables () {
+  const m = state.meta;
+  const reg = m.regression_results;
+  const cls = m.classification_results;
+
+  const regBody = document.querySelector("#reg-table tbody");
+  const regMaxR2 = Math.max(...Object.values(reg).map(v => v.r2));
+  regBody.innerHTML = Object.entries(reg).map(([name, v]) => {
+    const lead = Math.abs(v.r2 - regMaxR2) < 1e-9;
+    const barW = Math.max(0, v.r2 / regMaxR2) * 80;
+    return `<tr class="${lead ? 'lead' : ''}">
+      <td>${name}</td>
+      <td class="num">${v.r2.toFixed(3)}<span class="bar" style="width:${barW}px"></span></td>
+      <td class="num">${v.mae.toFixed(2)}</td>
+      <td class="num">${v.rmse.toFixed(2)}</td>
+    </tr>`;
+  }).join("");
+
+  const clsBody = document.querySelector("#cls-table tbody");
+  const clsMaxAuc = Math.max(...Object.values(cls).map(v => v.auc_roc));
+  clsBody.innerHTML = Object.entries(cls).map(([name, v]) => {
+    const lead = Math.abs(v.auc_roc - clsMaxAuc) < 1e-9;
+    const barW = Math.max(0, (v.auc_roc - 0.5) / (clsMaxAuc - 0.5)) * 80;
+    return `<tr class="${lead ? 'lead' : ''}">
+      <td>${name}</td>
+      <td class="num">${(v.accuracy * 100).toFixed(1)}%</td>
+      <td class="num">${v.f1.toFixed(3)}</td>
+      <td class="num">${v.auc_roc.toFixed(3)}<span class="bar" style="width:${barW}px"></span></td>
+    </tr>`;
+  }).join("");
+}
+
+function renderFeatureImportance () {
+  const fi = state.meta.feature_importances;
+  const entries = Object.entries(fi).slice(0, 16);
+  const max = Math.max(...entries.map(([, v]) => v));
+  document.getElementById("feat-importance").innerHTML = entries.map(([k, v], i) => {
+    const w = (v / max) * 100;
+    const pretty = FEATURE_PRETTY[k] || k;
+    return `<div class="feat-row">
+      <span class="rank">${String(i + 1).padStart(2, "0")}</span>
+      <span class="name">${pretty}</span>
+      <span class="val">${v.toFixed(3)}</span>
+      <div class="track"><span style="width:${w}%"></span></div>
+    </div>`;
+  }).join("");
+}
+
+function renderClusterProfiles () {
+  const c = state.clusters.cluster_profiles;
+
+
+
+  const byPosition = {};
+  Object.entries(c).forEach(([id, p]) => {
+    const pos = p.position || "Unknown";
+    (byPosition[pos] ||= []).push({ id, ...p });
+  });
+
+
+  state.archetypeNames = {};
+  Object.entries(c).forEach(([id, p]) => {
+    const siblings = byPosition[p.position || "Unknown"];
+    state.archetypeNames[id] = archetypeName(p, siblings);
+  });
+
+
+  const positionOrder = ["Guard", "Forward", "Center"];
+  const legendEl = document.getElementById("scatter-legend");
+  legendEl.innerHTML = positionOrder
+    .filter(pos => byPosition[pos])
+    .map(pos => {
+      return byPosition[pos].map(cp =>
+        `<span class="cl"><span class="sw" style="background:${clusterColor(cp.id)}"></span> ${state.archetypeNames[cp.id]}</span>`
+      ).join("&nbsp;&nbsp;");
+    }).join('<span style="color:var(--ink-3)"> &nbsp;|&nbsp; </span>');
+
+
+  const filterEl = document.getElementById("f-cluster");
+  const groupOptions = positionOrder
+    .filter(pos => byPosition[pos])
+    .map(pos => {
+      const opts = byPosition[pos].map(cp =>
+        `<option value="${cp.id}">${state.archetypeNames[cp.id]}</option>`
+      ).join("");
+      return `<optgroup label="${pos}s">${opts}</optgroup>`;
+    }).join("");
+  filterEl.innerHTML = '<option value="">All archetypes</option>' + groupOptions;
+
+
+  const el = document.getElementById("cluster-profiles");
+  el.innerHTML = positionOrder
+    .filter(pos => byPosition[pos])
+    .map(pos => {
+      const heading = `<div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px;border-bottom:1px solid var(--hairline);padding-bottom:4px">${pos}s &nbsp;·&nbsp; ${byPosition[pos].length} archetypes</div>`;
+      const cards = byPosition[pos].map(cp => `
+        <div class="cluster-stat">
+          <div class="cluster-head">
+            <span class="sw" style="background:${clusterColor(cp.id)}"></span>
+            ${state.archetypeNames[cp.id]} &nbsp;·&nbsp; n=${cp.count}
+          </div>
+          <div class="cluster-body">
+            <div class="kv"><div class="k">Mean VORP</div><div class="v">${fmtSigned(cp.mean_vorp, 2)}</div></div>
+            <div class="kv"><div class="k">PPG</div><div class="v">${cp.ppg.toFixed(1)}</div></div>
+            <div class="kv"><div class="k">RPG</div><div class="v">${cp.rpg.toFixed(1)}</div></div>
+            <div class="kv"><div class="k">APG</div><div class="v">${cp.apg.toFixed(1)}</div></div>
+            <div class="kv"><div class="k">SPG</div><div class="v">${cp.spg.toFixed(2)}</div></div>
+            <div class="kv"><div class="k">BPG</div><div class="v">${cp.bpg.toFixed(2)}</div></div>
+            <div class="kv"><div class="k">TS%</div><div class="v">${(cp.ts_pct * 100).toFixed(1)}</div></div>
+            <div class="kv"><div class="k">WS/40</div><div class="v">${cp.ws_40.toFixed(2)}</div></div>
+            <div class="kv"><div class="k">Recruit</div><div class="v">${cp.recruit_rank.toFixed(0)}</div></div>
+          </div>
+        </div>`).join("");
+      return heading + cards;
+    }).join("");
+}
+
+function renderBigBoard () {
+  const bb = state.bigboard;
+  const section = document.getElementById("bigboard-section");
+  if (!bb || !bb.length) { section.hidden = true; return; }
+  section.hidden = false;
+
+
+  const avg = bb.reduce((s, p) => s + p.predicted_vorp, 0) / bb.length;
+  const positive = bb.filter(p => p.predicted_vorp > 0).length;
+  document.getElementById("bb-meta").textContent =
+    `${bb.length} PROSPECTS · MEAN PROJ. ${avg >= 0 ? '+' : ''}${avg.toFixed(2)} · ${positive} WITH POS. PROJ.`;
+
+
+  const top = bb.slice(0, 10);
+  const topEl = document.getElementById("bb-top");
+  topEl.innerHTML = top.map(p => {
+    const col = clusterColor(p.cluster);
+    const rnk = String(p.rank).padStart(2, "0");
+    const ft = Math.floor(p.height_inches / 12), inch = p.height_inches % 12;
+    const height = `${ft}&#39;${inch}"`;
+    return `<div class="bb-card" data-rank="${p.rank}" style="--cluster-color:${col}">
+      <div class="rnk ${p.rank <= 3 ? 'rnk-top10' : ''}">${rnk}</div>
+      <div class="body">
+        <h3 class="name">${p.player_name}</h3>
+        <div class="sub">${p.position} &nbsp;·&nbsp; ${height} &nbsp;·&nbsp; ${p.college}</div>
+        <div class="statline">
+          ${p.ppg.toFixed(1)} <span class="sep">·</span> ${p.rpg.toFixed(1)} R <span class="sep">·</span>
+          ${p.apg.toFixed(1)} A <span class="sep">·</span> ${(p.ts_pct * 100).toFixed(1)} TS%
+          <span class="sep">·</span> ${p.ws_40.toFixed(2)} WS/40<br>
+          <span style="color:var(--ink-3)">
+            ${p.recruit_rank >= 101 ? "Unranked recruit" : "Recruit #" + p.recruit_rank}
+            <span class="sep">·</span> ${p.college_seasons} season${p.college_seasons > 1 ? "s" : ""}
+            <span class="sep">·</span> ${(state.archetypeNames && state.archetypeNames[p.cluster]) || "—"}
+          </span>
+        </div>
+      </div>
+      <div class="pred">
+        <div class="v ${p.predicted_vorp >= 0 ? 'up' : ''}">${p.predicted_vorp >= 0 ? '+' : ''}${p.predicted_vorp.toFixed(2)}</div>
+        <div class="k">Proj. VORP</div>
+        <div class="prob">P(+) = ${(p.posvorp_prob * 100).toFixed(0)}%</div>
+      </div>
+    </div>`;
+  }).join("");
+  topEl.querySelectorAll(".bb-card").forEach(el => {
+    el.addEventListener("click", () => {
+      const p = bb.find(x => x.rank === Number(el.dataset.rank));
+      if (p) openDrawer({ ...p, draft_year: 2026 });
+    });
+  });
+
+
+  const rest = bb.slice(10);
+  document.getElementById("bb-rest-count").textContent = rest.length + " prospects";
+  const restEl = document.getElementById("bb-rest");
+  restEl.innerHTML = rest.map(p => `
+    <div class="row" data-rank="${p.rank}">
+      <span class="rnk">${String(p.rank).padStart(2, "0")}</span>
+      <span class="name">${p.player_name}<span class="meta">&nbsp;· ${p.position.charAt(0)} · ${p.college}</span></span>
+      <span class="pred">${p.predicted_vorp >= 0 ? '+' : ''}${p.predicted_vorp.toFixed(2)}<span class="prob">${(p.posvorp_prob * 100).toFixed(0)}%</span></span>
+    </div>
+  `).join("");
+  restEl.querySelectorAll(".row").forEach(el => {
+    el.addEventListener("click", () => {
+      const p = bb.find(x => x.rank === Number(el.dataset.rank));
+      if (p) openDrawer({ ...p, draft_year: 2026 });
+    });
+  });
+}
+
+let scatterHit = null;
+function renderScatter () {
+  const canvas = document.getElementById("pca-canvas");
+  const tt = document.getElementById("scatter-tt");
+  const dpr = window.devicePixelRatio || 1;
+  const pts = state.prospects.map(p => ({ x: p.pca_1, y: p.pca_2, c: p.cluster, p }));
+
+  const xMin = Math.min(...pts.map(p => p.x)) - 0.5;
+  const xMax = Math.max(...pts.map(p => p.x)) + 0.5;
+  const yMin = Math.min(...pts.map(p => p.y)) - 0.5;
+  const yMax = Math.max(...pts.map(p => p.y)) + 0.5;
+
+  function resize () {
+    const W = canvas.parentElement.clientWidth;
+    const H = 560;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    draw();
+  }
+
+  function xy (p) {
+    const W = canvas.width / dpr, H = canvas.height / dpr;
+    const pad = 36;
+    const px = pad + ((p.x - xMin) / (xMax - xMin)) * (W - pad * 2);
+    const py = H - pad - ((p.y - yMin) / (yMax - yMin)) * (H - pad * 2);
+    return [px, py];
+  }
+
+  function draw (hover) {
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = canvas.width / dpr, H = canvas.height / dpr;
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.strokeStyle = "rgba(23,20,17,0.08)";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(36 + ((W - 72) * i / 4), 20);
+      ctx.lineTo(36 + ((W - 72) * i / 4), H - 20);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(20, 36 + ((H - 72) * i / 4));
+      ctx.lineTo(W - 20, 36 + ((H - 72) * i / 4));
+      ctx.stroke();
+    }
+
+    const [ox, oy] = xy({ x: 0, y: 0 });
+    ctx.strokeStyle = "rgba(23,20,17,0.28)";
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath(); ctx.moveTo(ox, 20); ctx.lineTo(ox, H - 20); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20, oy); ctx.lineTo(W - 20, oy); ctx.stroke();
+    ctx.setLineDash([]);
+
+
+    const rgba = (hex, a) => {
+      const n = parseInt(hex.slice(1), 16);
+      return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+    };
+    for (const p of pts) {
+      const [x, y] = xy(p);
+      const isTest = p.p.is_test;
+      ctx.fillStyle = rgba(clusterColor(p.c), 0.55);
+      ctx.strokeStyle = isTest ? "rgba(23,20,17,0.9)" : "rgba(23,20,17,0.0)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(x, y, isTest ? 3.8 : 2.8, 0, Math.PI * 2);
+      ctx.fill();
+      if (isTest) ctx.stroke();
+    }
+
+    if (hover) {
+      const [x, y] = xy(hover);
+      ctx.strokeStyle = COLORS.ink;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = clusterColor(hover.c);
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    let best = null, bestD = 10;
+    for (const p of pts) {
+      const [x, y] = xy(p);
+      const d = Math.hypot(mx - x, my - y);
+      if (d < bestD) { bestD = d; best = p; }
+    }
+    if (best) {
+      scatterHit = best;
+      canvas.style.cursor = "pointer";
+      tt.style.opacity = 1;
+      tt.style.left = (mx + 14) + "px";
+      tt.style.top = (my - 8) + "px";
+      tt.innerHTML = `<b>${best.p.player_name}</b><br>${best.p.college} · ${best.p.draft_year}<br>VORP act ${fmt(best.p.actual_vorp, 1)} · pred ${fmt(best.p.predicted_vorp, 2)}`;
+      draw(best);
+    } else {
+      scatterHit = null;
+      canvas.style.cursor = "default";
+      tt.style.opacity = 0;
+      draw(null);
+    }
+  });
+  canvas.addEventListener("mouseleave", () => { scatterHit = null; tt.style.opacity = 0; draw(null); });
+  canvas.addEventListener("click", () => { if (scatterHit) openDrawer(scatterHit.p); });
+
+  window.addEventListener("resize", resize);
+  resize();
+}
+
+function populateFilterYears () {
+  const years = [...new Set(state.prospects.map(p => p.draft_year))].sort();
+  const sel = document.getElementById("f-year");
+  years.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y; o.textContent = y;
+    sel.appendChild(o);
+  });
+}
+
+function bindFilters () {
+  ["f-search", "f-pos", "f-year", "f-split", "f-cluster"].forEach(id => {
+    document.getElementById(id).addEventListener("input", applyFiltersAndRender);
+  });
+}
+
+function applyFiltersAndRender () {
+  const q = document.getElementById("f-search").value.trim().toLowerCase();
+  const pos = document.getElementById("f-pos").value;
+  const yr = document.getElementById("f-year").value;
+  const split = document.getElementById("f-split").value;
+  const cl = document.getElementById("f-cluster").value;
+
+  state.filtered = state.prospects.filter(p => {
+    if (q && !(p.player_name.toLowerCase().includes(q) || (p.college || "").toLowerCase().includes(q))) return false;
+    if (pos && p.position !== pos) return false;
+    if (yr && String(p.draft_year) !== yr) return false;
+    if (split === "train" && p.is_test) return false;
+    if (split === "test" && !p.is_test) return false;
+    if (cl && String(p.cluster) !== cl) return false;
+    return true;
+  });
+
+  sortFiltered();
+  renderTable();
+  document.getElementById("f-count").textContent = state.filtered.length + " of " + state.prospects.length + " players";
+}
+
+function bindSorts () {
+  document.querySelectorAll("#ptable thead th").forEach(th => {
+    th.addEventListener("click", () => {
+      const key = th.dataset.sort;
+      if (!key) return;
+      if (state.sortKey === key) state.sortDir = -state.sortDir;
+      else { state.sortKey = key; state.sortDir = (typeof state.prospects[0][key] === "string") ? 1 : -1; }
+      document.querySelectorAll("#ptable thead th").forEach(t => {
+        t.classList.remove("sorted");
+        t.querySelector(".caret").textContent = "";
+      });
+      th.classList.add("sorted");
+      th.querySelector(".caret").textContent = state.sortDir === 1 ? "▲" : "▼";
+      sortFiltered();
+      renderTable();
+    });
+  });
+}
+
+function sortFiltered () {
+  const k = state.sortKey, d = state.sortDir;
+  state.filtered.sort((a, b) => {
+    let av = a[k], bv = b[k];
+    if (av == null) av = d === 1 ? Infinity : -Infinity;
+    if (bv == null) bv = d === 1 ? Infinity : -Infinity;
+    if (typeof av === "string") return av.localeCompare(bv) * d;
+    return (av - bv) * d;
+  });
+}
+
+function renderTable () {
+  const tbody = document.querySelector("#ptable tbody");
+  const frag = document.createDocumentFragment();
+  state.filtered.forEach(p => {
+    const tr = document.createElement("tr");
+    tr.dataset.name = p.player_name;
+    const dot = clusterColor(p.cluster);
+    const delta = p.actual_vorp - p.predicted_vorp;
+    const prob = (p.posvorp_prob || 0);
+    tr.innerHTML = `
+      <td class="name"><span class="cluster-dot" style="background:${dot}"></span>${p.player_name}
+        ${p.is_test ? '<span class="pill test">Test</span>' : ''}
+        <span class="meta">${p.position} · ${p.college}</span></td>
+      <td>${p.college}</td>
+      <td>${p.draft_year}</td>
+      <td>${p.position.charAt(0)}</td>
+      <td>${fmt(p.ppg, 1)}</td>
+      <td>${fmt(p.rpg, 1)}</td>
+      <td>${fmt(p.apg, 1)}</td>
+      <td>${fmt(p.ts_pct, 3)}</td>
+      <td>${fmt(p.ws_40, 3)}</td>
+      <td>${p.recruit_rank >= 101 ? "—" : p.recruit_rank}</td>
+      <td class="${p.actual_vorp >= 0 ? 'delta-pos' : 'delta-neg'}">${fmtSigned(p.actual_vorp, 1)}</td>
+      <td>${fmtSigned(p.predicted_vorp, 2)}</td>
+      <td><span class="posvorp-bar"><span style="width:${(prob * 100).toFixed(0)}%"></span></span>${fmtPct(prob)}</td>
+    `;
+    tr.addEventListener("click", () => openDrawer(p));
+    frag.appendChild(tr);
+  });
+  tbody.innerHTML = "";
+  tbody.appendChild(frag);
+}
+
+function bindDrawer () {
+  document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+  document.getElementById("drawer-overlay").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
+}
+function closeDrawer () {
+  document.getElementById("drawer").classList.remove("show");
+  document.getElementById("drawer-overlay").classList.remove("show");
+}
+function openDrawer (p) {
+  const isProjection = (p.actual_vorp == null);
+  document.getElementById("d-name").textContent = p.player_name;
+  const metaBits = [p.position.toUpperCase(), p.college];
+  if (p.draft_year) metaBits.push(p.draft_year);
+  if (isProjection && p.rank != null) metaBits.push(`BIG-BOARD #${p.rank} · PROJECTED`);
+  else if (p.is_test) metaBits.push("TEST SET");
+  document.getElementById("d-meta").textContent = metaBits.join(" · ");
+
+  const shap = (p.shap_features || []).slice(0, 8);
+  const maxAbs = Math.max(1e-6, ...shap.map(s => Math.abs(s.shap)));
+  const shapHTML = shap.map(s => {
+    const pretty = FEATURE_PRETTY[s.feature] || s.feature;
+    const pct = (Math.abs(s.shap) / maxAbs) * 50;
+    const neg = s.shap < 0;
+    const style = neg
+      ? `right: 50%; width: ${pct}%`
+      : `left: 50%; width: ${pct}%`;
+    return `<div class="shap-row">
+      <span class="name">${pretty}</span>
+      <div class="track">
+        <div class="mid"></div>
+        <div class="bar ${neg ? 'neg' : ''}" style="${style}"></div>
+      </div>
+      <span class="val">${fmtSigned(s.shap, 2)}</span>
+    </div>`;
+  }).join("");
+
+  const compsHTML = (p.comps || []).map(c => `
+    <tr>
+      <td class="name">${c.player_name}</td>
+      <td>${c.position.charAt(0)}</td>
+      <td>${c.college}</td>
+      <td>${c.draft_year}</td>
+      <td class="num ${c.actual_vorp >= 0 ? 'delta-pos' : 'delta-neg'}">${fmtSigned(c.actual_vorp, 1)}</td>
+    </tr>
+  `).join("");
+
+  const body = document.getElementById("drawer-body");
+  const predictHTML = isProjection
+    ? `<div class="big-predict">
+        <div class="col pred" style="flex:1">
+          <div class="v">${fmtSigned(p.predicted_vorp, 2)}</div>
+          <div class="k">Projected 4-yr VORP</div>
+          <div class="sub">P(VORP&gt;0) = ${fmtPct(p.posvorp_prob)}
+          ${p.rank ? ` &nbsp;·&nbsp; Board rank #${p.rank}` : ''}</div>
+        </div>
+      </div>`
+    : `<div class="big-predict">
+        <div class="col actual">
+          <div class="v ${p.actual_vorp >= 0 ? 'delta-pos' : 'delta-neg'}">${fmtSigned(p.actual_vorp, 1)}</div>
+          <div class="k">Actual 4-yr VORP</div>
+        </div>
+        <div class="col pred">
+          <div class="v">${fmtSigned(p.predicted_vorp, 2)}</div>
+          <div class="k">Predicted</div>
+          <div class="sub">P(VORP&gt;0) = ${fmtPct(p.posvorp_prob)}</div>
+        </div>
+      </div>`;
+  body.innerHTML = `
+    <div class="drawer-section">${predictHTML}</div>
+
+    <div class="drawer-section">
+      <h5>College box score</h5>
+      <div class="stat-grid">
+        <div class="kv"><div class="k">PPG</div><div class="v">${fmt(p.ppg,1)}</div></div>
+        <div class="kv"><div class="k">RPG</div><div class="v">${fmt(p.rpg,1)}</div></div>
+        <div class="kv"><div class="k">APG</div><div class="v">${fmt(p.apg,1)}</div></div>
+        <div class="kv"><div class="k">SPG</div><div class="v">${fmt(p.spg,2)}</div></div>
+        <div class="kv"><div class="k">BPG</div><div class="v">${fmt(p.bpg,2)}</div></div>
+        <div class="kv"><div class="k">TS%</div><div class="v">${(p.ts_pct*100).toFixed(1)}</div></div>
+        <div class="kv"><div class="k">WS/40</div><div class="v">${fmt(p.ws_40,3)}</div></div>
+        <div class="kv"><div class="k">Seasons</div><div class="v">${p.college_seasons}</div></div>
+        <div class="kv"><div class="k">Recruit rank</div><div class="v">${p.recruit_rank >= 101 ? "—" : p.recruit_rank}</div></div>
+        <div class="kv"><div class="k">Archetype</div><div class="v" style="color:${clusterColor(p.cluster)}">${p.cluster} · ${(state.archetypeNames && state.archetypeNames[p.cluster]) || "—"}</div></div>
+        <div class="kv"><div class="k">PC 1</div><div class="v">${fmt(p.pca_1,2)}</div></div>
+        <div class="kv"><div class="k">PC 2</div><div class="v">${fmt(p.pca_2,2)}</div></div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <h5>Why the model said what it said · top SHAP drivers</h5>
+      ${shapHTML || '<p style="color:var(--ink-3);font-size:13px">No SHAP data exported for this prospect.</p>'}
+    </div>
+
+    <div class="drawer-section">
+      <h5>Nearest neighbors in feature space</h5>
+      <table class="comps-table">
+        <thead><tr><th>Comparable</th><th>Pos</th><th>College</th><th>Yr</th><th style="text-align:right">Actual VORP</th></tr></thead>
+        <tbody>${compsHTML || '<tr><td colspan="5" style="color:var(--ink-3)">—</td></tr>'}</tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById("drawer").classList.add("show");
+  document.getElementById("drawer-overlay").classList.add("show");
+}
+
+function initPredictor () {
+  const form = document.getElementById("predictor-form");
+  form.querySelectorAll(".slider").forEach(s => {
+    const inp = s.querySelector("input[type=range]");
+    const val = s.querySelector(".val");
+    inp.min = s.dataset.min;
+    inp.max = s.dataset.max;
+    inp.step = s.dataset.step;
+    inp.value = s.dataset.default;
+    const decimals = (s.dataset.step.toString().split(".")[1] || "").length;
+    val.textContent = Number(inp.value).toFixed(decimals);
+    inp.addEventListener("input", () => {
+      val.textContent = Number(inp.value).toFixed(decimals);
+      recomputePrediction();
+    });
+  });
+  form.querySelectorAll("input[type=radio]").forEach(r => r.addEventListener("change", recomputePrediction));
+  recomputePrediction();
+}
+
+function readPredictorInputs () {
+  const out = {};
+  document.querySelectorAll("#predictor-form .slider").forEach(s => {
+    out[s.dataset.key] = Number(s.querySelector("input[type=range]").value);
+  });
+  out.position = document.querySelector("input[name=pred-pos]:checked").value;
+  return out;
+}
+
+function buildFeatureVector (inputs) {
+  const m = state.meta;
+  const pos = inputs.position;
+  const posStats = state.posStats;
+
+
+  const vec = {};
+  m.feature_names.forEach(f => { vec[f] = m.scaler_mean[f]; });
+
+
+  ["ppg", "rpg", "apg", "spg", "bpg", "ts_pct", "ws_40",
+   "three_pt_attempt_rate", "recruit_rank", "college_seasons"].forEach(k => {
+    if (k in inputs && k in vec) vec[k] = inputs[k];
+  });
+
+
+  ["ppg", "rpg", "apg", "spg", "bpg", "ts_pct", "ws_40"].forEach(k => {
+    const zKey = k + "_vs_pos";
+    if (zKey in vec && posStats[k] && posStats[k][pos]) {
+      const mu = posStats[k][pos].mean, sd = posStats[k][pos].std;
+      vec[zKey] = sd > 0 ? (inputs[k] - mu) / sd : 0;
+    }
+  });
+
+
+  const LEAGUE_3P = 0.312;
+  const K_3P = 0.083;
+  if ("three_pt_pct_vw" in vec) {
+    const rate = inputs.three_pt_attempt_rate;
+    const pct = inputs.three_pt_pct;
+    vec.three_pt_pct_vw =
+      (pct * rate + LEAGUE_3P * K_3P) / (rate + K_3P);
+  }
+
+
+  if ("ws40_per_season" in vec) vec.ws40_per_season = inputs.ws_40 / Math.max(inputs.college_seasons, 1);
+  if ("def_versatility" in vec) vec.def_versatility = inputs.spg * inputs.bpg;
+  if ("recruit_x_ws40" in vec) vec.recruit_x_ws40 = (101 - inputs.recruit_rank) * inputs.ws_40;
+  if ("one_and_done" in vec) vec.one_and_done = inputs.college_seasons === 1 ? 1 : 0;
+  if ("is_top_100_recruit" in vec) vec.is_top_100_recruit = inputs.recruit_rank <= 100 ? 1 : 0;
+  if ("is_top_10_recruit" in vec) vec.is_top_10_recruit = inputs.recruit_rank <= 10 ? 1 : 0;
+
+  return vec;
+}
+
+function ridgePredict (vec) {
+  const m = state.meta;
+  let y = m.ridge_intercept;
+  for (const f of m.feature_names) {
+    const x = vec[f];
+    const mu = m.scaler_mean[f], sd = m.scaler_scale[f];
+    const z = sd > 0 ? (x - mu) / sd : 0;
+    y += (m.ridge_coefficients[f] || 0) * z;
+  }
+  return y;
+}
+
+function recomputePrediction () {
+  const inputs = readPredictorInputs();
+  const vec = buildFeatureVector(inputs);
+  const y = ridgePredict(vec);
+
+  document.getElementById("pred-vorp").innerHTML =
+    (y >= 0 ? "+" : "") + y.toFixed(2) + '<span class="unit">VORP</span>';
+
+
+  const sorted = state.prospects.map(p => p.predicted_vorp).filter(v => v != null).sort((a, b) => a - b);
+  let lo = 0, hi = sorted.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (sorted[mid] < y) lo = mid + 1; else hi = mid; }
+  const pct = Math.round((lo / sorted.length) * 100);
+  document.getElementById("pred-pct").textContent = pct + "th";
+
+
+  const prob = 1 / (1 + Math.exp(-(y - 0) * 0.9));
+  document.getElementById("pred-prob").textContent = (prob * 100).toFixed(0) + "%";
+
+
+
+  const similar = state.prospects.filter(p => Math.abs(p.predicted_vorp - y) < 0.75);
+  const avgActual = similar.length ? similar.reduce((a, b) => a + b.actual_vorp, 0) / similar.length : y;
+  document.getElementById("pred-seasons").textContent = Math.max(0, Math.min(10, 2 + avgActual * 0.6)).toFixed(1);
+
+
+  const inputVec = [inputs.ppg, inputs.rpg, inputs.apg, inputs.spg, inputs.bpg, inputs.ts_pct, inputs.ws_40];
+  const profiles = state.clusters.cluster_profiles;
+  const sameSide = Object.entries(profiles)
+    .filter(([, c]) => !c.position || c.position === inputs.position);
+  const pool = sameSide.length ? sameSide : Object.entries(profiles);
+  let bestK = pool[0][0], bestD = Infinity;
+  for (const [k, c] of pool) {
+    const cv = [c.ppg, c.rpg, c.apg, c.spg, c.bpg, c.ts_pct, c.ws_40];
+    const d = Math.sqrt(cv.reduce((s, v, i) => s + (v - inputVec[i]) ** 2, 0));
+    if (d < bestD) { bestD = d; bestK = k; }
+  }
+  document.getElementById("pred-arch").textContent =
+    (state.archetypeNames && state.archetypeNames[bestK]) || ("Cluster " + bestK);
+
+
+  const verdictEl = document.getElementById("pred-verdict");
+  let verdict;
+  if (y >= 6)       verdict = "An elite projection — the model sees a star in the making.";
+  else if (y >= 3)  verdict = "A high-end rotation player, maybe an All-Star ceiling.";
+  else if (y >= 1)  verdict = "A useful NBA contributor — starter-level on a good night.";
+  else if (y >= 0)  verdict = "A marginal positive — likely a long-tenured role player.";
+  else if (y >= -1) verdict = "Replacement-level. A roster fringe projection.";
+  else              verdict = "A skeptical projection. The model doesn't see NBA viability.";
+  verdictEl.textContent = verdict;
+}
+
+</script>
+</body>
+</html>
