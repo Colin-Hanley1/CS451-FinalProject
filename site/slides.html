@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CS 451 Final — Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+
+:root {
+  --paper:    #f2ead9;
+  --paper-hi: #f8f1e1;
+  --ink:      #171411;
+  --ink-2:    #4a443b;
+  --ink-3:    #7a7266;
+  --ox:       #a63818;
+  --ox-deep:  #741d0b;
+  --navy:     #1f3a5c;
+  --sage:     #516b3e;
+  --hairline: rgba(23,20,17,0.18);
+  --serif:  'Fraunces', Georgia, serif;
+  --sans:   'IBM Plex Sans', sans-serif;
+  --mono:   'IBM Plex Mono', monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); overflow: hidden; }
+body {
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(166,56,24,0.04), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(31,58,92,0.03), transparent 50%);
+}
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 56px 80px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+.slide-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+  border-bottom: 3px double var(--ink);
+  margin-bottom: 40px;
+}
+.slide-no {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--ox); font-weight: 500;
+}
+.slide-kicker {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
+h1.title {
+  font-family: var(--serif);
+  font-style: italic; font-weight: 500;
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+  margin: 0 0 24px;
+}
+h1.title .amp { color: var(--ox); font-variation-settings: "SOFT" 100, "WONK" 1; }
+h2.slide-title {
+  font-family: var(--serif);
+  font-style: italic; font-weight: 500;
+  font-size: 44px; line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+  margin: 0 0 30px;
+  color: var(--ink);
+}
+
+.body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.lead {
+  font-family: var(--serif);
+  font-size: 28px; line-height: 1.4; color: var(--ink);
+  max-width: 22ch;
+}
+.lead.narrow { max-width: 20ch; }
+.lead em { color: var(--ox); font-style: italic; }
+p.copy { font-family: var(--sans); font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 60ch; margin: 0 0 14px; }
+.stat-row { display: flex; gap: 56px; flex-wrap: wrap; margin: 30px 0 0; }
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat .v { font-family: var(--serif); font-size: 62px; line-height: 1;
+  font-weight: 500; color: var(--ink); font-feature-settings: "tnum"; }
+.stat .v.ox { color: var(--ox); }
+.stat .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-3); }
+
+.pull {
+  font-family: var(--serif);
+  font-style: italic; font-weight: 400;
+  font-size: clamp(40px, 5vw, 72px); line-height: 1.1;
+  letter-spacing: -0.01em;
+  max-width: 22ch;
+  color: var(--ink);
+  font-variation-settings: "SOFT" 60, "WONK" 1;
+}
+.pull .hl { background: linear-gradient(transparent 68%, rgba(166,56,24,0.25) 68%); }
+.pull .ox { color: var(--ox); }
+
+table.data { border-collapse: collapse; font-size: 20px; margin-top: 12px; }
+table.data th, table.data td { text-align: left; padding: 14px 22px; border-bottom: 1px solid var(--hairline); }
+table.data th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+table.data td { font-family: var(--mono); font-feature-settings: "tnum"; }
+table.data td.name { font-family: var(--sans); font-weight: 500; font-size: 19px; }
+table.data tr.lead-row td { color: var(--ink); font-weight: 500; }
+table.data tr.lead-row td::after { content: ""; }
+table.data tr.lead-row td:first-child::after { content: " ◆"; color: var(--ox); font-size: 14px; }
+table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+ul.stages { list-style: none; padding: 0; margin: 0; }
+ul.stages li {
+  display: grid; grid-template-columns: 28px 200px 1fr; gap: 20px;
+  padding: 14px 0; border-bottom: 1px solid var(--hairline);
+  font-size: 19px; line-height: 1.3;
+}
+ul.stages li .n { font-family: var(--mono); color: var(--ox); font-weight: 500; }
+ul.stages li .h { font-family: var(--sans); font-weight: 600; }
+ul.stages li .d { color: var(--ink-2); }
+
+ul.bullets { padding: 0; margin: 0; list-style: none; }
+ul.bullets li {
+  padding: 12px 0; border-bottom: 1px dotted var(--hairline);
+  font-size: 19px; line-height: 1.45; color: var(--ink);
+}
+ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
+  letter-spacing: 0.06em; margin-right: 10px; }
+
+.arch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 24px; margin-top: 8px; }
+.arch-col h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--hairline); font-weight: 500; }
+.arch-col .row { display: flex; gap: 10px; align-items: baseline; margin: 6px 0;
+  font-family: var(--sans); font-size: 17px; }
+.arch-col .row .sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.arch-col .row .name { color: var(--ink); font-weight: 500; }
+.arch-col .row .vorp { color: var(--ink-3); font-family: var(--mono); font-size: 13px; margin-left: auto; font-feature-settings: "tnum"; }
+
+.demo-cta {
+  margin-top: auto;
+  background: var(--ink); color: var(--paper);
+  padding: 32px 36px;
+  display: flex; justify-content: space-between; align-items: center;
+  border: 3px solid var(--ox);
+}
+.demo-cta .lh {
+  font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-size: 40px; line-height: 1; font-variation-settings: "SOFT" 40, "WONK" 1;
+}
+.demo-cta .rh {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--paper); opacity: 0.85;
+}
+
+.title-slide { justify-content: center; align-items: flex-start; padding: 80px 100px; }
+.title-slide .meta { font-family: var(--mono); font-size: 12px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 24px; }
+.title-slide h1 { margin-bottom: 40px; max-width: 18ch; }
+.title-slide .sub { font-family: var(--serif); font-style: italic; font-size: 26px;
+  line-height: 1.4; max-width: 28ch; color: var(--ink-2); margin-bottom: 40px; }
+.title-slide .author {
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink); border-top: 3px double var(--ink);
+  padding-top: 20px; width: 360px;
+}
+.title-slide .author b { color: var(--ox); font-weight: 500; }
+
+.slide-footer {
+  position: absolute; bottom: 24px; left: 80px; right: 80px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink-3);
+  border-top: 1px solid var(--hairline); padding-top: 14px;
+}
+.slide-footer .dots { display: flex; gap: 6px; }
+.slide-footer .dots span {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--hairline);
+}
+.slide-footer .dots span.on { background: var(--ox); }
+
+.controls {
+  position: fixed; bottom: 16px; right: 20px;
+  display: flex; gap: 8px; z-index: 10;
+}
+.controls button {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; border: 1px solid var(--ink); background: var(--paper-hi);
+  color: var(--ink); padding: 6px 12px; cursor: pointer;
+}
+.controls button:hover { background: var(--ink); color: var(--paper); }
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+.split.ratio-3-4 { grid-template-columns: 3fr 4fr; }
+.split.ratio-4-3 { grid-template-columns: 4fr 3fr; }
+.split.stacked { align-items: start; }
+.split > .left, .split > .right { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+
+.fig-frame {
+  border: 1px solid var(--ink);
+  background: #fff;
+  padding: 10px;
+  box-shadow: 5px 5px 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+}
+.fig-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 58vh;
+  object-fit: contain;
+}
+.fig-frame .cap {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hairline);
+  text-align: left;
+}
+.fig-frame.full { flex: 1; }
+.fig-frame.full img { max-height: 68vh; }
+
+.model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; flex: 1; }
+.model-card {
+  display: flex; flex-direction: column;
+  padding: 14px 18px 12px;
+  border: 1px solid var(--ink);
+  background: var(--paper-hi);
+  box-shadow: 3px 3px 0 var(--ink);
+  min-height: 0;
+}
+.model-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: 10px;
+}
+.model-name {
+  font-family: var(--serif); font-style: italic; font-weight: 600;
+  font-size: 22px; color: var(--ink);
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+}
+.model-type {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ox);
+  border: 1px solid var(--ox); padding: 2px 7px;
+}
+.model-formula {
+  font-family: var(--serif); font-style: italic;
+  font-size: 15px; color: var(--ink);
+  background: var(--paper);
+  padding: 6px 10px;
+  border-left: 2px solid var(--ox);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.model-formula code {
+  font-family: var(--mono); font-style: normal; font-size: 13px;
+}
+.model-spec { list-style: none; padding: 0; margin: 0 0 8px; }
+.model-spec li {
+  display: grid; grid-template-columns: 130px 1fr;
+  gap: 10px; padding: 3px 0;
+  border-bottom: 1px dotted var(--hairline);
+  font-size: 13px; line-height: 1.4;
+}
+.model-spec li .k {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3);
+  padding-top: 2px;
+}
+.model-spec li .v {
+  font-family: var(--mono); color: var(--ink);
+  font-feature-settings: "tnum";
+}
+.model-spec li .v .ox { color: var(--ox); font-weight: 500; }
+.model-spec li .v code {
+  font-family: var(--mono); font-size: 12px;
+  background: var(--paper); border: 1px solid var(--hairline);
+  padding: 0 4px;
+}
+
+.flow { display: flex; flex-direction: column; gap: 0; flex: 1; justify-content: center; }
+.flow-step {
+  display: grid; grid-template-columns: 130px 1fr;
+  gap: 24px; align-items: center;
+  padding: 16px 22px;
+  background: var(--paper-hi);
+  border: 1px solid var(--ink);
+  border-left: 6px solid var(--ox);
+}
+.flow-step .stage-label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--ox); font-weight: 500;
+}
+.flow-step .stage-body .h {
+  font-family: var(--sans); font-weight: 600; font-size: 17px;
+  margin: 0 0 4px; color: var(--ink);
+}
+.flow-step .stage-body .d {
+  font-family: var(--mono); font-size: 13px; color: var(--ink-2);
+  line-height: 1.55;
+}
+.flow-step .stage-body code {
+  font-family: var(--mono); font-size: 13px;
+  background: var(--paper); border: 1px solid var(--hairline);
+  padding: 1px 5px;
+}
+.flow .arrow {
+  text-align: center;
+  font-family: var(--mono); color: var(--ox);
+  font-size: 18px; line-height: 0.6;
+  padding: 4px 0;
+}
+
+.sm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.sm-grid .fig-frame { box-shadow: 3px 3px 0 var(--ink); padding: 6px; }
+.sm-grid .fig-frame img { max-height: 28vh; }
+.sm-grid .fig-frame .cap { font-size: 9.5px; letter-spacing: 0.14em; margin-top: 4px; padding-top: 4px; }
+
+@media print {
+  .controls { display: none; }
+  .slide {
+    position: relative;
+    opacity: 1 !important;
+    pointer-events: auto;
+    page-break-after: always;
+    width: 100vw; height: 100vh;
+  }
+  body { overflow: visible; }
+}
+
+@media (max-width: 900px) {
+  .slide { padding: 30px 36px; }
+  .title-slide { padding: 40px 36px; }
+  h1.title { font-size: 52px; }
+  h2.slide-title { font-size: 32px; }
+  .stat .v { font-size: 44px; }
+  .pull { font-size: 36px; }
+  .arch-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<section class="slide active title-slide" data-slide="1">
+  <div class="meta">CS 451 · Introduction to Data Science · Final Project · Spring 2026</div>
+  <h1 class="title">The Prospect <span class="amp">&amp;</span> Almanac</h1>
+  <div class="sub">
+    Projecting four-year NBA value from college statistics and
+    high-school recruiting profiles, from the draft classes of 2000 to 2022.
+  </div>
+  <div class="author">
+    <b>Colin Hanley - Group #27</b><br />
+  </div>
+</section>
+
+<section class="slide" data-slide="2">
+  <div class="slide-head">
+    <span class="slide-no">§ 1 · The Question</span>
+    <span class="slide-kicker">Motivation</span>
+  </div>
+  <div class="body">
+    <div class="pull">
+      Given only collegiate production and
+      <span class="ox">high school recruiting data</span>,
+      how much of a prospect's early career NBA production
+      <span class="hl">we predict using ML techniques?</span>
+    </div>
+    <p class="copy" style="margin-top: 40px; max-width: 64ch">
+      NBA teams spend millions on scouting that combines stats, video, and
+      human judgment. This project sets out to solve a narrower question, how much of a player's
+      early career production can be predicted using only collegiate box-score information?
+    </p>
+  </div>
+</section>
+
+<section class="slide" data-slide="3">
+  <div class="slide-head">
+    <span class="slide-no">§ 2 · The Data</span>
+    <span class="slide-kicker">Sources &amp; scope</span>
+  </div>
+  <h2 class="slide-title">1,042 drafted college players, 2000 &ndash; 2022.</h2>
+  <div class="split ratio-3-4">
+    <div class="left">
+      <ul class="bullets">
+        <li><b>SRC</b> <b>Basketball-Reference</b> &mdash; college career stats, advanced metrics, 4-year NBA outcomes.</li>
+        <li><b>SRC</b> <b>247Sports</b> composite &mdash; HS recruiting rank.</li>
+        <li><b>TGT</b> <b>4-year VORP</b> &mdash; cumulative Value Over Replacement.</li>
+        <li><b>TGT</b> <b>PosVORP</b> &mdash; binary positive-VORP classifier. Is the player above replacement-level through their first four seasons?</li>
+      </ul>
+      <div class="stat-row" style="margin-top: 18px">
+        <div class="stat"><div class="v">1,042</div><div class="k">Players</div></div>
+        <div class="stat"><div class="v">41</div><div class="k">Features</div></div>
+        <div class="stat"><div class="v ox">2019</div><div class="k">Split year</div></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="fig-frame">
+        <img src="figures/01_target_distribution.png" alt="Distribution of 4-year VORP and BPM" />
+        <div class="cap">Fig 1 &middot; Target distribution &mdash; right-skewed; median drafted player ≈ 0.6 VORP over four years.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="4">
+  <div class="slide-head">
+    <span class="slide-no">§ 3 · Exploratory Analysis</span>
+    <span class="slide-kicker">Three views that shaped the pipeline</span>
+  </div>
+  <h2 class="slide-title">What the raw data was telling us.</h2>
+  <div class="body">
+    <div class="sm-grid">
+      <div class="fig-frame">
+        <img src="figures/02_pick_vs_vorp.png" alt="Draft pick vs VORP" />
+        <div class="cap">Fig 2 &middot; Pick ↔ VORP (r ≈ −0.40)</div>
+      </div>
+      <div class="fig-frame">
+        <img src="figures/03_position_analysis.png" alt="VORP by position" />
+        <div class="cap">Fig 3 &middot; VORP by position</div>
+      </div>
+      <div class="fig-frame">
+        <img src="figures/05_recruiting_impact.png" alt="VORP by recruiting tier" />
+        <div class="cap">Fig 4 &middot; Recruit tier ↔ hit rate</div>
+      </div>
+    </div>
+    <p class="copy" style="margin-top: 24px; max-width: 72ch">
+      As expected, pick number has the strongest correlation to 4-year VORP. However, we cannot use this information, as it leaks the target variable we are trying to predict.
+      Position distributions have little impact on VORP, but recruiting tier does, drafting a former top-10 recruit results in an above replacement-level player almost twice as often as drafting an unranked player
+    </p>
+  </div>
+</section>
+
+<section class="slide" data-slide="5">
+  <div class="slide-head">
+    <span class="slide-no">§ 4 · Feature Engineering</span>
+    <span class="slide-kicker">13 new columns beyond the raw 28</span>
+  </div>
+  <h2 class="slide-title">Feature engineering to account for positional differnces and shot volume</h2>
+  <div class="split ratio-3-4">
+    <div class="left">
+      <ul class="bullets">
+        <li><b>01</b> <b>Position-relative z-scores</b> for 7 stats. A guard with 4 RPG is average; a center with 4 RPG is below replacement.</li>
+        <li><b>02</b> <b>Volume-weighted 3P%</b> &mdash; shrinkage toward the 31.2% league mean by attempt rate.</li>
+        <li><b>03</b> <b>Def. versatility</b> &mdash; SPG &times; BPG.</li>
+        <li><b>04</b> <b>Recruit &times; efficiency</b> &mdash; did the player live up to the hype?</li>
+        <li><b>05</b> <b>Build score</b> &mdash; position-relative height + weight.</li>
+      </ul>
+    </div>
+    <div class="right">
+      <div class="fig-frame">
+        <img src="figures/08_feature_correlations.png" alt="Top-20 feature correlations with VORP" />
+        <div class="cap">Fig 5 &middot; Top 20 features by |r| with 4-yr VORP &mdash; engineered <em>_vs_pos</em> features dominate.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="6">
+  <div class="slide-head">
+    <span class="slide-no">§ 5 · Modeling</span>
+    <span class="slide-kicker">Temporal split to prevent leakage</span>
+  </div>
+  <h2 class="slide-title">Three regressors on a hold-out the future can't see.</h2>
+  <div class="body">
+    <ul class="stages">
+      <li><span class="n">I</span><span class="h">Split at 2019</span>
+        <span class="d">Train on classes 2000 &ndash; 2018 (n = 851) · test on 2019 &ndash; 2022 (n = 191).</span></li>
+      <li><span class="n">II</span><span class="h">Ridge (α = 10)</span>
+        <span class="d">Linear baseline. Coefficients shipped to the browser for the live predictor.</span></li>
+      <li><span class="n">III</span><span class="h">XGBoost</span>
+        <span class="d">50-iteration <em>RandomizedSearchCV</em> over 6 hyperparameters, 5-fold CV.</span></li>
+      <li><span class="n">IV</span><span class="h">Multi-layer perceptron</span>
+        <span class="d">20 iterations over hidden sizes, learning rate, L² regularisation.</span></li>
+      <li><span class="n">V</span><span class="h">Parallel classifiers</span>
+        <span class="d">Same three families, binarised target (<em>PosVORP</em>), same CV grid.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-slide="7">
+  <div class="slide-head">
+    <span class="slide-no">§ 6 · Model Architectures</span>
+    <span class="slide-kicker">Structure + fitted hyperparameters after CV selection</span>
+  </div>
+  <h2 class="slide-title">Four models, up close.</h2>
+  <div class="body">
+    <div class="model-grid">
+
+
+      <div class="model-card">
+        <div class="model-head">
+          <span class="model-name">Ridge Regression</span>
+          <span class="model-type">Linear · L²</span>
+        </div>
+        <div class="model-formula">
+          <code>β̂ = argmin&nbsp;‖y − Xβ‖² + α‖β‖²</code>
+        </div>
+        <ul class="model-spec">
+          <li><span class="k">α (L² penalty)</span><span class="v"><span class="ox">10</span></span></li>
+          <li><span class="k">Coefficients</span><span class="v">41 (one per feature)</span></li>
+          <li><span class="k">Intercept</span><span class="v">+1.191 VORP</span></li>
+          <li><span class="k">Solver</span><span class="v">closed-form (Cholesky)</span></li>
+          <li><span class="k">Shipped to browser</span><span class="v">yes &mdash; <code>~4 KB JSON</code></span></li>
+        </ul>
+      </div>
+
+
+      <div class="model-card">
+        <div class="model-head">
+          <span class="model-name">XGBoost Regressor</span>
+          <span class="model-type">Gradient-boosted trees</span>
+        </div>
+        <div class="model-formula">
+          <code>ŷ = Σ<sub>k=1..K</sub> f<sub>k</sub>(x)</code>, &nbsp;each&nbsp;<code>f<sub>k</sub></code> a CART of depth&nbsp;≤&nbsp;D
+        </div>
+        <ul class="model-spec">
+          <li><span class="k">n_estimators (K)</span><span class="v"><span class="ox">200</span> trees</span></li>
+          <li><span class="k">max_depth (D)</span><span class="v">4</span></li>
+          <li><span class="k">learning_rate (η)</span><span class="v">0.01</span></li>
+          <li><span class="k">subsample</span><span class="v">0.7 rows per tree</span></li>
+          <li><span class="k">colsample_bytree</span><span class="v">0.7 features per tree</span></li>
+          <li><span class="k">min_child_weight</span><span class="v">5</span></li>
+          <li><span class="k">objective</span><span class="v"><code>reg:squarederror</code></span></li>
+          <li><span class="k">Explainer</span><span class="v">SHAP <code>TreeExplainer</code> (exact)</span></li>
+        </ul>
+      </div>
+
+
+      <div class="model-card">
+        <div class="model-head">
+          <span class="model-name">Multi-Layer Perceptron</span>
+          <span class="model-type">Feed-forward NN</span>
+        </div>
+        <div class="model-formula">
+          <code>41 → 128 → 64 → 1</code> &nbsp;· ReLU activations · L² weight decay
+        </div>
+        <ul class="model-spec">
+          <li><span class="k">Hidden layers</span><span class="v"><span class="ox">(128, 64)</span></span></li>
+          <li><span class="k">Activation</span><span class="v">ReLU</span></li>
+          <li><span class="k">Solver</span><span class="v">Adam</span></li>
+          <li><span class="k">α (L² penalty)</span><span class="v">0.001</span></li>
+          <li><span class="k">learning_rate_init</span><span class="v">0.001</span></li>
+          <li><span class="k">Early stopping</span><span class="v">15% validation split</span></li>
+          <li><span class="k">Converged at</span><span class="v">25 epochs</span></li>
+          <li><span class="k">Trainable params</span><span class="v">~13.7k</span></li>
+        </ul>
+      </div>
+
+
+      <div class="model-card">
+        <div class="model-head">
+          <span class="model-name">Per-Position K-Means</span>
+          <span class="model-type">Unsupervised</span>
+        </div>
+        <div class="model-formula">
+          <code>argmin<sub>C</sub> Σ<sub>i</sub> ‖x<sub>i</sub> − μ<sub>C(i)</sub>‖²</code> &nbsp;· fit separately per position
+        </div>
+        <ul class="model-spec">
+          <li><span class="k">k (Guard)</span><span class="v">3 &middot; inertia 12632 &middot; 23 iters</span></li>
+          <li><span class="k">k (Forward)</span><span class="v">3 &middot; inertia 13515 &middot; 16 iters</span></li>
+          <li><span class="k">k (Center)</span><span class="v">2 &middot; inertia 3898 &middot; 5 iters</span></li>
+          <li><span class="k">Total archetypes</span><span class="v"><span class="ox">8</span></span></li>
+          <li><span class="k">Initialisation</span><span class="v">k-means++ &middot; n_init = 10</span></li>
+          <li><span class="k">Feature space</span><span class="v">41-dim, StandardScaler'd</span></li>
+          <li><span class="k">Projection</span><span class="v">PCA 2D (36.6% var)</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="8">
+  <div class="slide-head">
+    <span class="slide-no">§ 7 · Results</span>
+    <span class="slide-kicker">Test set · 2019 – 2022 · n = 191</span>
+  </div>
+  <h2 class="slide-title">XGBoost wins, modestly.</h2>
+  <div class="split ratio-4-3 stacked">
+    <div class="left">
+      <table class="data" style="margin-top: 0; font-size: 17px">
+        <thead>
+          <tr><th>Model</th><th>R²</th><th>MAE</th><th>RMSE</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name">Ridge (baseline)</td><td class="num">0.162</td><td class="num">1.78</td><td class="num">2.35</td></tr>
+          <tr class="lead-row"><td class="name">XGBoost</td><td class="num">0.202</td><td class="num">1.67</td><td class="num">2.29</td></tr>
+          <tr><td class="name">Neural Network</td><td class="num">0.152</td><td class="num">1.65</td><td class="num">2.36</td></tr>
+        </tbody>
+      </table>
+      <p class="copy" style="margin-top: 22px; font-size: 17px">
+        XGBoost explains about <b style="color:var(--ox)">20%</b> of
+        hold-out variance. On the positive-VORP classifier: <b>56.5%</b>
+        accuracy with AUC <b>0.591</b>. That 20% <em>is</em> the value of
+        purely statistical scouting; the remaining 80% is why teams still
+        hire people to watch tape.
+      </p>
+    </div>
+    <div class="right">
+      <div class="fig-frame">
+        <img src="figures/09_model_comparison.png" alt="Model comparison and confusion matrix" />
+        <div class="cap">Fig 6 &middot; Regression comparison + XGBoost classification confusion matrix.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="9">
+  <div class="slide-head">
+    <span class="slide-no">§ 8 · What Matters</span>
+    <span class="slide-kicker">SHAP · mean |impact| on test-set predictions</span>
+  </div>
+  <h2 class="slide-title">Four of the top five features are position-relative.</h2>
+  <div class="split ratio-3-4 stacked">
+    <div class="left">
+      <ul class="bullets" style="font-size: 17px">
+        <li><b>01</b> <b>WS/40 vs. pos</b> &mdash; efficient producers.</li>
+        <li><b>02</b> <b>APG vs. pos</b> &mdash; peer-relative playmaking.</li>
+        <li><b>03</b> <b>SPG</b> (raw) &mdash; defensive disruption.</li>
+        <li><b>04</b> <b>SPG vs. pos</b> &mdash; disruption, adjusted.</li>
+        <li><b>05</b> <b>RPG vs. pos</b> &mdash; rebounding over peers.</li>
+      </ul>
+      <p class="copy" style="margin-top: 18px; font-size: 16px">
+        The SHAP ranking validates the single most impactful
+        engineering decision: raw box-score stats are dominated by their
+        position-normalised counterparts.
+      </p>
+    </div>
+    <div class="right">
+      <div class="fig-frame full">
+        <img src="figures/10_shap_importance.png" alt="SHAP summary plot" />
+        <div class="cap">Fig 7 &middot; SHAP beeswarm &mdash; per-player feature impact on the XGBoost test predictions.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="10">
+  <div class="slide-head">
+    <span class="slide-no">§ 9 · Archetypes</span>
+    <span class="slide-kicker">K-means within each position · 8 clusters</span>
+  </div>
+  <h2 class="slide-title">The draft, unsupervised, in eight types.</h2>
+  <div class="split ratio-3-4 stacked">
+    <div class="left">
+      <div class="arch-grid" style="grid-template-columns: 1fr; gap: 8px 0">
+        <div class="arch-col">
+          <h3>Guards &middot; k = 3</h3>
+          <div class="row"><span class="sw" style="background: #a63818"></span><span class="name">Disruptive</span><span class="vorp">+1.60</span></div>
+          <div class="row"><span class="sw" style="background: #1f3a5c"></span><span class="name">Rim-protecting</span><span class="vorp">+1.28</span></div>
+          <div class="row"><span class="sw" style="background: #516b3e"></span><span class="name">Efficient</span><span class="vorp">+0.78</span></div>
+        </div>
+        <div class="arch-col">
+          <h3>Forwards &middot; k = 3</h3>
+          <div class="row"><span class="sw" style="background: #b9862c"></span><span class="name">Efficient</span><span class="vorp">+1.12</span></div>
+          <div class="row"><span class="sw" style="background: #2d6e73"></span><span class="name">Traditional</span><span class="vorp">+0.94</span></div>
+          <div class="row"><span class="sw" style="background: #6a2e52"></span><span class="name">Scoring</span><span class="vorp">+2.17</span></div>
+        </div>
+        <div class="arch-col">
+          <h3>Centers &middot; k = 2</h3>
+          <div class="row"><span class="sw" style="background: #4a4a5a"></span><span class="name">Rim-protecting</span><span class="vorp">+0.17</span></div>
+          <div class="row"><span class="sw" style="background: #8b2014"></span><span class="name">Efficient</span><span class="vorp">+1.67</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="fig-frame full">
+        <img src="figures/12_kmeans_clusters.png" alt="PCA scatter + mean VORP per cluster" />
+        <div class="cap">Fig 8 &middot; Left: per-position clusters on the shared PCA plane. Right: mean 4-yr VORP by archetype.</div>
+      </div>
+    </div>
+  </div>
+  <p class="copy" style="margin-top: 16px; max-width: 72ch; font-size: 16px">
+    Mean VORP spans an order of magnitude (<b>+0.17 → +2.17</b>). Labels
+    are derived from within-position z-scores gated by absolute basketball
+    thresholds &mdash; a guard with 0.5 BPG can't be stamped "rim-protecting."
+  </p>
+</section>
+
+<section class="slide" data-slide="11">
+  <div class="slide-head">
+    <span class="slide-no">§ 10 · 2026 Big Board</span>
+    <span class="slide-kicker">Trained model applied to the incoming class</span>
+  </div>
+  <h2 class="slide-title">Projections for the draftees who haven't been drafted.</h2>
+  <div class="body">
+    <table class="data">
+      <thead><tr><th>Rank</th><th>Player</th><th>College</th><th>Pos</th><th>Proj. VORP</th><th>P(VORP+)</th></tr></thead>
+      <tbody>
+        <tr class="lead-row"><td class="num">1</td><td class="name">Cameron Boozer</td><td>Duke</td><td>F</td><td class="num">+9.29</td><td class="num">75%</td></tr>
+        <tr><td class="num">2</td><td class="name">Caleb Wilson</td><td>North Carolina</td><td>F</td><td class="num">+5.56</td><td class="num">78%</td></tr>
+        <tr><td class="num">3</td><td class="name">Kingston Flemings</td><td>Houston</td><td>G</td><td class="num">+4.53</td><td class="num">84%</td></tr>
+        <tr><td class="num">4</td><td class="name">Allen Graves</td><td>Santa Clara</td><td>F</td><td class="num">+4.48</td><td class="num">69%</td></tr>
+        <tr><td class="num">5</td><td class="name">Brayden Burries</td><td>Arizona</td><td>G</td><td class="num">+4.23</td><td class="num">83%</td></tr>
+      </tbody>
+    </table>
+    <div class="demo-cta">
+      <div class="lh">Live demo &rarr; <span style="color: var(--ox)">open the almanac.</span></div>
+      <div class="rh">site/index.html &middot; sliders &middot; drawer &middot; PCA scatter</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="12">
+  <div class="slide-head">
+    <span class="slide-no">§ 11 · Technical Architecture</span>
+    <span class="slide-kicker">How a CSV becomes a dashboard</span>
+  </div>
+  <h2 class="slide-title">One pipeline, four layers, one command.</h2>
+  <div class="body">
+    <div class="flow">
+      <div class="flow-step">
+        <div class="stage-label">I · Data</div>
+        <div class="stage-body">
+          <div class="h">Raw inputs</div>
+          <div class="d">
+            <code>fixeddata.csv</code> &mdash; 1,042 × 28 (scraped Basketball-Reference
+            + 247Sports) &middot; <code>2026class.csv</code> &mdash; 40 × 27 (incoming class).
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼</div>
+
+      <div class="flow-step">
+        <div class="stage-label">II · Preprocess</div>
+        <div class="stage-body">
+          <div class="h">Shared feature engineering</div>
+          <div class="d">
+            <code>src/preprocess.py</code> &mdash; 13 engineered columns, position
+            z-scores, shrinkage 3P%, build score. Same function called on
+            historical and 2026 data for distributional parity.
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼</div>
+
+      <div class="flow-step">
+        <div class="stage-label">III · Train</div>
+        <div class="stage-body">
+          <div class="h">Model fitting + explanation + clustering</div>
+          <div class="d">
+            <code>src/train.py</code> &mdash; temporal split, 3 regressors + 2 classifiers
+            with <code>RandomizedSearchCV</code>, SHAP <code>TreeExplainer</code>,
+            per-position K-means, global PCA. One command, ~2 min on a laptop.
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼</div>
+
+      <div class="flow-step">
+        <div class="stage-label">IV · Artifacts</div>
+        <div class="stage-body">
+          <div class="h">Serialised for the frontend</div>
+          <div class="d">
+            <code>models/*.pkl</code> (7 files) &middot; <code>site/data/*.json</code>
+            (5 files) &middot; <code>figures/*.png</code> (12 plots).
+            <code>bigboard.json</code> regenerated separately via
+            <code>generate_bigboard.py</code> without retraining.
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼</div>
+
+      <div class="flow-step">
+        <div class="stage-label">V · Deploy</div>
+        <div class="stage-body">
+          <div class="h">Static single-page dashboard</div>
+          <div class="d">
+            <code>site/index.html</code> &mdash; vanilla HTML/CSS/JS, no framework.
+            Ridge coefficients + scaler in <code>model_meta.json</code> drive
+            the in-browser live predictor; SHAP/comps are read from
+            <code>prospects.json</code>. Total deploy bundle: <b>~700 KB</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="13">
+  <div class="slide-head">
+    <span class="slide-no">§ 12 · Limitations &amp; Next Steps</span>
+    <span class="slide-kicker">What the model doesn't see</span>
+  </div>
+  <h2 class="slide-title">Four-fifths of the story lives outside the box score.</h2>
+  <div class="body">
+    <ul class="bullets">
+      <li><b>R²</b> <b>20% explained</b> bounds the value of purely statistical scouting. The rest is strength of schedule, physical testing, shot selection, tape.</li>
+      <li><b>N</b> <b>Only 120 centers</b> &mdash; K-means uses k=2 for that group; the predictor is noisiest on bigs.</li>
+      <li><b>POS</b> <b>&ldquo;Forward&rdquo; is a noisy label</b> &mdash; it conflates 3&amp;D wings with interior fours. Position-relative z-scores help but don't fix it.</li>
+      <li><b>ERA</b> <b>No era adjustment</b> &mdash; a 2003 draftee played a very different game. The model is agnostic to when you were drafted.</li>
+      <li><b>TODO</b> <b>Next</b> &mdash; SOS adjustment, combine data, per-game shot-chart features, an ensemble with scouting-consensus priors.</li>
+    </ul>
+    <p class="copy" style="margin-top: 40px; color: var(--ox); font-family: var(--serif); font-style: italic; font-size: 22px">
+      Thank you. Questions?
+    </p>
+  </div>
+</section>
+
+<div class="controls">
+  <button id="prev">← Prev</button>
+  <button id="next">Next →</button>
+  <button id="print">Print PDF</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll(".slide");
+const total = slides.length;
+let idx = 0;
+
+function show (i) {
+  idx = Math.max(0, Math.min(total - 1, i));
+  slides.forEach((s, n) => s.classList.toggle("active", n === idx));
+  ensureFooters();
+  updateDots();
+}
+function ensureFooters () {
+  slides.forEach((s, n) => {
+    if (s.querySelector(".slide-footer")) return;
+    const f = document.createElement("div");
+    f.className = "slide-footer";
+    const dots = Array.from({length: total}, (_, j) =>
+      `<span class="${j === n ? "on" : ""}"></span>`).join("");
+    f.innerHTML = `
+      <span>CS 451 · Prospect Almanac · Colin Hanley</span>
+      <span class="dots">${dots}</span>
+      <span>${String(n + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}</span>`;
+    s.appendChild(f);
+  });
+}
+function updateDots () {
+  document.querySelectorAll(".slide-footer").forEach((f, n) => {
+    f.querySelectorAll(".dots span").forEach((d, j) =>
+      d.classList.toggle("on", j === idx));
+  });
+}
+ensureFooters();
+
+const embedded = (window.parent && window.parent !== window);
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") show(idx + 1);
+  else if (e.key === "ArrowLeft" || e.key === "PageUp") show(idx - 1);
+  else if (e.key === "Home") show(0);
+  else if (e.key === "End") show(total - 1);
+  else if (e.key === "p" || e.key === "P") window.print();
+  else if (e.key === "Escape" && embedded) {
+    window.parent.postMessage("slides:exit", "*");
+  }
+});
+document.getElementById("prev").addEventListener("click", () => show(idx - 1));
+document.getElementById("next").addEventListener("click", () => show(idx + 1));
+document.getElementById("print").addEventListener("click", () => window.print());
+</script>
+</body>
+</html>

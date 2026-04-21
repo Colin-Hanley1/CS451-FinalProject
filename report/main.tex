@@ -1,0 +1,519 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+
+\graphicspath{{figures/}}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Projecting NBA Rookie-Contract Value from College Statistics\\
+\large A supervised and unsupervised pipeline over 1,042 draftees, 2000--2022}
+
+\author{\IEEEauthorblockN{Colin Hanley}
+\IEEEauthorblockA{\textit{CS 451 --- Introduction to Data Science}\\
+Spring 2026}}
+
+\maketitle
+
+% ══════════════════════════════════════════════════════════════════════
+\begin{abstract}
+We ask how much of an NBA player's first four years of on-court value --
+measured by cumulative Value Over Replacement Player (VORP) -- can be
+recovered from their college box-score statistics and pre-college recruiting
+profile alone. We assemble a dataset of 1{,}042 college players drafted
+between 2000 and 2022, engineer 13 features beyond the 28 raw columns
+(including position-relative z-scores, a volume-weighted three-point
+percentage, and defensive-versatility interactions), and train three
+regression models (Ridge, XGBoost, and an MLP) with a strict temporal
+train/test split. XGBoost wins on every metric, with a hold-out
+$R^2 = 0.202$, MAE of 1.67 VORP, and an AUC of 0.591 on the binarised
+positive-VORP classification task. Unsupervised K-means fit within each
+position group surfaces eight interpretable player archetypes (three guard
+types, three forward types, two center types) whose mean future VORP
+differs by a factor of ten. The trained pipeline is shipped as an
+interactive dashboard that exposes Ridge coefficients to the browser for
+live predictions and displays a projected 2026-class big board with SHAP
+drivers and same-position historical comparables. Four-fifths of the
+variance in four-year VORP remains unexplained by college-era features
+alone -- a quantitative bound on how far statistical scouting can go
+without scouting.
+\end{abstract}
+
+\begin{IEEEkeywords}
+sports analytics, gradient boosting, SHAP, K-means, feature engineering,
+NBA draft
+\end{IEEEkeywords}
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Introduction}
+
+Every June, NBA front offices assemble a public-facing ranked list of
+roughly sixty college and international prospects and commit tens of
+millions of dollars in contracts based on that ordering. Scouts watch
+video, interview players, and argue about motor; the result is a draft
+order whose quality is only apparent four years later, when rookie
+contracts expire and retrospective value metrics become credible.
+
+This project asks a narrower, more tractable question:
+\emph{given only what a prospect did in college, and what he was thought
+of in high school, how much of his four-year NBA value can a machine
+recover?} The answer bounds the value a purely statistical scout can add
+to a human-intensive process, and in doing so separates patterns the box
+score already contains from patterns that require tape study, physical
+measurements, or interviews to see.
+
+We frame it as both a regression task (predicting cumulative four-year
+VORP from a player's rookie contract) and a binary classification task
+(predicting whether that four-year VORP is positive --- i.e.\ whether the
+player ever contributed at a replacement-level-or-better rate). We
+additionally use unsupervised clustering to discover interpretable
+player archetypes without reference to outcomes, and ship the entire
+pipeline as an interactive editorial dashboard that applies the model to
+the incoming 2026 draft class.
+
+\textbf{Contributions.} (i) An end-to-end pipeline from scraped
+historical data through model comparison, explanation, and deployment;
+(ii) a volume-weighted three-point-percentage feature that shrinks low-
+attempt players toward the league mean, removing 0\,\%/100\,\% noise;
+(iii) per-position K-means producing eight interpretable archetypes with
+auto-derived labels that pass absolute basketball thresholds, not just
+within-cluster z-scores; (iv) a deployable static dashboard whose Ridge
+live predictor runs entirely in the browser with no server.
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Related Work}
+
+Draft prediction has a long public-facing history in basketball
+analytics. Oliver's \emph{Basketball on Paper}~\cite{oliver2004basketball}
+formalised the possession-based efficiency metrics (offensive rating,
+defensive rating, true shooting) that later underpin our feature set.
+The NBA's retrospective Box Plus/Minus and VORP
+frameworks~\cite{myers2020bpm} give us the target variable: VORP weights
+a player's BPM by minutes played and baselines against a
+replacement-level rotation player.
+
+Gradient-boosted trees~\cite{chen2016xgboost} are the dominant family for
+tabular prediction tasks of this size and structure; SHAP
+values~\cite{lundberg2017shap} give us a principled, per-prediction
+explanation we can surface in the dashboard without sacrificing the
+predictive accuracy of a non-linear model. Both are used via their
+canonical implementations; all scikit-learn
+algorithms~\cite{pedregosa2011sklearn} are used off the shelf.
+
+The most visible public draft-prediction tooling is ESPN's BPI Draft Model
+and 538's CARMELO/DRAYMOND historical projections, both of which combine
+college stats with physical measurements and scouting rank. Our work
+\emph{differs} from these in three ways: (a) we use exclusively
+free public data (Basketball-Reference~\cite{bbref} and the 247Sports
+composite~\cite{247sports}), making the pipeline fully reproducible; (b)
+our model is position-aware through engineered z-score features rather
+than through position-specific model heads; and (c) our archetype
+discovery is unsupervised --- labels are derived from within-cluster
+stat deviations rather than hand-assigned.
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Data}
+
+\subsection{Sources}
+Two public sources were scraped:
+\begin{itemize}
+  \item \textbf{Basketball-Reference}~\cite{bbref}: per-player college career
+    totals, advanced metrics (WS, WS/40, TOV\%, FTr, three-point
+    attempt rate), draft position, and first four seasons of NBA box-score
+    and advanced metrics.
+  \item \textbf{247Sports composite}~\cite{247sports}: high-school recruiting
+    rank, coerced to an integer $1\ldots101$, with 101 used as a sentinel
+    for unranked players.
+\end{itemize}
+
+The resulting dataset is 1{,}042 players drafted between 2000 and 2022.
+One row was dropped for a missing NBA target (career-ending injury before
+reaching the NBA), and two rows had obvious scraping-error
+\texttt{fg\_pct} values (Hamady N'Diaye's 2.2 and Tristan Thompson's 30.7)
+which we manually corrected using the companion \texttt{ts\_pct} field.
+
+\subsection{Target}
+Our primary regression target is \texttt{nba\_4yr\_vorp} -- the sum of a
+player's Value Over Replacement Player statistic across their first four
+NBA seasons. The classification target \texttt{PosVORP} is simply
+\texttt{(nba\_4yr\_vorp $> 0$)}. Target distribution is right-skewed
+(\cref{fig:target}): the median drafted player accumulates roughly 0.6
+VORP over four years, while stars reach 20+.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{01_target_distribution}
+  \caption{Distribution of the regression target (4-year VORP) and the
+    complementary BPM target. Both are heavily right-skewed; roughly
+    half of drafted players finish their rookie contract at
+    negative VORP.}
+  \label{fig:target}
+\end{figure}
+
+\subsection{Feature schema}
+After cleaning we retain 28 raw columns: 10 per-game box-score stats,
+8 percentage and advanced stats, 4 cumulative win-share columns, 2 physical
+measurements, and 4 discrete indicators (position, college seasons,
+one-and-done, recruit tier). To these we add 13 engineered features
+(\cref{sec:methodology}). The final feature matrix has
+$n = 1{,}042$ rows and 41 columns.
+
+A correlation scan (\cref{fig:corr}) shows the strongest raw
+correlates with four-year VORP are college \texttt{ws\_40} ($r\approx 0.29$)
+and draft-pick number ($r\approx -0.40$ --- not a feature, shown for
+reference). Individual box-score stats like PPG and RPG correlate only
+weakly, because they mean different things at different positions.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{04_correlation_heatmap}
+  \caption{Pearson correlation matrix for raw features and the
+    regression target. The strongest positive correlate with NBA VORP
+    among pre-engineering features is college WS/40.}
+  \label{fig:corr}
+\end{figure}
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Feature engineering}
+Raw per-game stats mean different things at different positions: 4\,RPG
+is league-average for a guard and terrible for a center. We therefore
+engineer \emph{position-relative z-scores} for seven stats
+(PPG, RPG, APG, SPG, BPG, TS\%, WS/40) using per-position means and
+standard deviations computed from the training set. These seven
+\texttt{\_vs\_pos} columns turn out to dominate the SHAP importance
+ranking downstream (\cref{sec:results}).
+
+Three interaction features capture non-linear signal:
+\begin{itemize}
+  \item \texttt{def\_versatility} $= \text{SPG} \times \text{BPG}$,
+    which combines perimeter and interior defense into a single scalar
+    that rewards players who contribute to both.
+  \item \texttt{recruit\_x\_ws40} $= (101 - \text{recruit\_rank})
+    \cdot \text{WS/40}$, asking whether a player lived up to their
+    high-school hype.
+  \item \texttt{ws40\_per\_season} $= \text{WS/40} \div
+    \text{college\_seasons}$, penalising players who needed four years
+    to reach efficient production.
+\end{itemize}
+
+\textbf{Volume-weighted three-point percentage.} Raw
+\texttt{three\_pt\_pct} contains serious noise from low-attempt
+players -- multiple centers post 0\,\% on one attempt, and several wings
+post 100\,\% on two. We replace it with a shrinkage estimate toward the
+league mean:
+\begin{equation}
+\widehat{p}_3 \;=\;
+\frac{p_3 \cdot r_3 + \bar{p}_3 \cdot k}{r_3 + k}
+\end{equation}
+where $p_3$ is the raw 3P\%, $r_3$ is three-point attempt rate,
+$\bar{p}_3 = 0.312$ is the dataset-wide mean, and $k = 0.083$ is the
+25\textsuperscript{th} percentile of $r_3$ in the training set. Under
+this transform, a player with 100\,\% on two attempts gets pulled almost
+entirely to the league mean, while a genuine volume shooter at 40\,\%
+with a 0.60 attempt rate barely shifts. This replaces
+\texttt{three\_pt\_pct} in the feature matrix rather than augmenting it.
+
+A final \texttt{build\_score} feature sums position-relative height and
+weight z-scores, capturing physical outliers for each position.
+
+\subsection{Train/test split}
+We adopt a \emph{temporal} train/test split at draft class 2019: train on
+the 851 players drafted 2000--2018, test on the 191 players drafted
+2019--2022. Randomly shuffling would leak signal from later players
+into the model through feature distribution changes (e.g.\ a steadily
+rising three-point attempt rate). The temporal split also simulates the
+real-world use case: a team in 2026 has four-year outcomes only for
+players drafted through 2022.
+
+\subsection{Models}
+Three regressors are trained with identical 5-fold cross-validation
+inside their respective hyperparameter searches:
+\begin{itemize}
+  \item \textbf{Ridge}~\cite{pedregosa2011sklearn} with $\alpha=10$ as an
+    interpretable linear baseline. Its coefficients are exported to the
+    browser for the dashboard's live predictor.
+  \item \textbf{XGBoost}~\cite{chen2016xgboost} with a 50-iteration
+    randomised hyperparameter search over \texttt{n\_estimators},
+    \texttt{max\_depth}, \texttt{learning\_rate}, \texttt{subsample},
+    \texttt{colsample\_bytree}, and \texttt{min\_child\_weight}.
+  \item \textbf{Multi-layer perceptron} (scikit-learn MLP) with 20
+    randomised search iterations over hidden layer shapes (two to four
+    layers, 16--128 units), initial learning rate, and $L^2$
+    regularisation.
+\end{itemize}
+Each regressor has a parallel classification head trained on
+\texttt{PosVORP} with the same search budget. All features are scaled
+with a \texttt{StandardScaler} fit only on the training set.
+
+\subsection{Unsupervised archetypes}
+We cluster the full (train + test) 1{,}042-row scaled feature matrix
+with K-means, but separately within each position group:
+$k = 3$ for guards (480 players), $k = 3$ for forwards (442), and
+$k = 2$ for centers (120). A single global K-means mostly just
+re-discovers the interior-vs-perimeter split (silhouette peaks at
+$k=2$); per-position clustering yields homogeneous archetypes within
+each role. Global PCA to two components (explaining $22.2 + 14.4 = 36.6\,\%$
+of total variance) provides a shared 2D embedding for visualisation.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{11_kmeans_selection}
+  \caption{Silhouette score by $k$, computed within each position group.
+    Dashed vertical lines mark the chosen $k$. Guard and forward
+    silhouettes are flat past $k=3$; centers are too small a group to
+    support more than two stable clusters.}
+  \label{fig:kselect}
+\end{figure}
+
+Archetype labels are derived client-side from each cluster's stat
+profile. A label is applied if (a) the within-position z-score exceeds
+a positive-z threshold and (b) the absolute stat value clears a
+basketball-literate floor (e.g.\ ``Rim-protecting'' requires
+$\text{BPG}\geq 1.0$, not just above-peer BPG). A
+$1.3\times$-the-floor override handles the two-cluster edge case where
+the second-best center still merits ``Rim-protecting'' despite
+a negative within-group z. Clusters with no positive-z label earning
+a floor are called ``Traditional \emph{$\langle$position$\rangle$}''.
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Results}
+\label{sec:results}
+
+\subsection{Regression}
+\cref{tab:regression} summarises hold-out performance.
+
+\begin{table}[t]
+  \centering
+  \caption{Regression on 4-year VORP, test set (2019--2022, $n=191$).}
+  \label{tab:regression}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    Model            & $R^2$  & MAE  & RMSE \\
+    \midrule
+    Ridge (baseline) & 0.162  & 1.78 & 2.35 \\
+    \textbf{XGBoost} & \textbf{0.202} & \textbf{1.67} & \textbf{2.29} \\
+    Neural Network   & 0.152  & 1.65 & 2.36 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+XGBoost wins on $R^2$ and RMSE; the MLP achieves the narrowest MAE,
+suggesting its errors are more symmetric but its large misses are
+larger. Ridge -- a one-line linear model -- is within 4\,$R^2$ points
+of the winner, which both validates the feature engineering and hints
+that we are near the ceiling of what the linear signal in these
+features can deliver.
+
+\subsection{Classification}
+On the binarised positive-VORP classifier, XGBoost lands at 56.5\,\%
+accuracy, 0.491 F1, and 0.591 AUC-ROC, narrowly ahead of the MLP
+(55.5\,\% / 0.479 / 0.579). An AUC of 0.591 is modestly better than
+chance, reflecting the same underlying truth as the regression $R^2$:
+four-fifths of the outcome variance lies outside the features we have.
+
+\subsection{Feature importance}
+\cref{fig:shap} shows the mean $|\text{SHAP}|$ ranking over the test set.
+Four of the top five features are \emph{position-relative} variants of
+raw stats, confirming that raw box-score columns are dominated by their
+z-score counterparts. Win Shares per 40 minutes (both position-relative
+and absolute) dominates the top slot, followed by playmaking
+(\texttt{apg\_vs\_pos}) and disruption (\texttt{spg}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{10_shap_importance}
+  \caption{Mean absolute SHAP values on the test set. Position-relative
+    z-score features occupy four of the top five slots, validating the
+    engineering choice to normalise by position.}
+  \label{fig:shap}
+\end{figure}
+
+\subsection{Archetypes and outcomes}
+\cref{fig:archetypes} plots the PCA embedding coloured by cluster, along
+with mean four-year VORP per cluster. The ``Scoring forward'' archetype
+(cluster 5, $n=101$, 13.7\,PPG, 7.4\,RPG, 1.42\,BPG) has the highest mean
+VORP at $+2.17$, while the ``Traditional center'' cluster (cluster 6,
+$n=82$) sits near replacement level at $+0.17$. The factor-of-ten spread
+across archetypes is much larger than the gap between the best and worst
+model on the test set, suggesting that \emph{which} kind of player you
+draft is a first-order signal -- one the unsupervised method found
+without reference to NBA outcomes.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{12_kmeans_clusters}
+  \caption{\textbf{Left:} per-position K-means clusters projected onto a
+    shared two-dimensional PCA. Marker shape encodes position, colour
+    encodes cluster. \textbf{Right:} mean four-year VORP by cluster, with
+    per-cluster sample size.}
+  \label{fig:archetypes}
+\end{figure}
+
+\subsection{2026 projections}
+Applying the trained XGBoost regressor to the 2026 draft class yields
+Cameron Boozer (Duke) at the top with a projected $+9.29$ four-year
+VORP, followed by Caleb Wilson (North Carolina, $+5.56$), Kingston
+Flemings (Houston, $+4.53$), and Allen Graves (Santa Clara, $+4.48$).
+The Graves projection is instructive: his college stat line (0.613 TS\%,
+1.9 SPG, 41\,\% on three-point volume, one-and-done) is genuinely
+elite-for-his-age, yet conventional scouting does not have him near the
+top of its boards. That gap is exactly the 80\,\% of variance the model
+does not capture: strength of schedule, tape study, and physical
+projection.
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Discussion}
+
+\textbf{What worked.} Position-relative z-scoring was the single most
+impactful feature-engineering decision, validated by SHAP: four of the
+top five features are \texttt{\_vs\_pos} variants. The volume-weighted
+three-point percentage modestly improved correlation with VORP
+($r: 0.023 \to 0.033$) and, more importantly, stabilised the tails of
+the feature distribution. Per-position K-means (over a single global
+K-means) produced interpretable archetypes at the cost of a slightly
+lower silhouette score -- a trade we are comfortable making because the
+goal was human-readable archetypes, not maximum-compactness clusters.
+
+\textbf{What didn't.} The neural network never matched XGBoost despite
+comparable hyperparameter budget. With only 851 training rows this is
+expected: deep learning's benefit over trees is a feature-interaction
+exploitation that requires more data to compete with boosted trees'
+greedy split search. We also tried dropping the volume-weighted 3P\%
+feature entirely and the gap was within noise -- XGBoost is robust to
+the exact functional form of engineered features.
+
+\textbf{Limitations.} Our $R^2$ of 0.202 bounds the value of purely
+statistical college-era scouting. The four-fifths of variance we don't
+capture includes: (a) strength of schedule (a 20-PPG scorer in the SEC
+$\neq$ a 20-PPG scorer in the Big South); (b) shot selection (a 50\,\%
+FG shooter with 60\,\% at the rim is different from one with 40\,\% on
+threes); (c) physical-measurement data (wingspan, reach, combine
+testing) which are public but unevenly available pre-2014; and (d)
+injury and developmental history. A future version of this work would
+ingest at least (a) and (c).
+
+Position labels are also noisy. ``Forward'' conflates wings and interior
+players; the archetype clustering partially corrects for this (the
+two interior-leaning forward clusters separate from the perimeter-leaning
+one on PC2) but the position label itself remains a coarse feature.
+Finally, era drift is unaddressed: a player drafted in 2003 plays a
+different game than one drafted in 2022. We did not attempt era
+normalisation.
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Conclusion and Future Work}
+
+Given only college box scores and high-school recruiting rank, a
+well-tuned XGBoost model explains 20\,\% of the variance in four-year
+NBA VORP on a held-out 2019--2022 test set -- a modest but real signal,
+and one that substantially outperforms a linear baseline only because of
+carefully engineered position-relative features. Unsupervised clustering
+within position groups discovers eight interpretable archetypes whose
+NBA outcomes differ by an order of magnitude, suggesting that ``what
+kind of prospect'' is a first-order signal even before ``how good.''
+
+Future work should incorporate strength-of-schedule adjustments, combine
+measurements, and possibly per-game shot-chart data now being made
+publicly available by the NCAA. An ensemble with NBA-side scouting
+priors (e.g.\ mock-draft consensus) could be tested for residual
+predictive content beyond the college statistical signal. Finally, the
+same pipeline can be retargeted to predict \emph{second-contract} value
+rather than rookie-contract value, which would better capture long-term
+NBA impact.
+
+% ══════════════════════════════════════════════════════════════════════
+\section{Individual Contributions}
+
+This is a solo project. All data acquisition, cleaning, feature
+engineering, modelling, frontend implementation, and writing was done by
+Colin Hanley.
+
+\paragraph*{Personal reflection.}
+The most valuable lesson was how much of the project's quality lived in
+feature engineering and error analysis, not in model selection. The gap
+between Ridge and XGBoost (4 $R^2$ points) was smaller than the gap
+between raw features and position-relative features (which I did not
+measure rigorously but was visible in SHAP). What I would do differently
+next time: set up an ablation study early so the relative contribution
+of each engineered feature is measured, not assumed; and collect
+strength-of-schedule data from the start rather than leaving it as
+future work.
+
+% ══════════════════════════════════════════════════════════════════════
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+% ══════════════════════════════════════════════════════════════════════
+\appendices
+\section{AI Usage Log}
+\label{app:ailog}
+
+The following log records uses of Claude (Anthropic) during this project
+in accordance with the course's AI/LLM policy. Each entry names the
+phase, summarises the prompt, summarises Claude's output, and documents
+what was accepted, modified, or rejected. This appendix is intentionally
+verbose: incomplete logging is called out in the rubric.
+
+% ─────────────────────────────────────────────────────────────
+\begin{verbatim}
+────────────────────────────────────────────
+AI Log Entry #1
+────────────────────────────────────────────
+Date:    2026-04-17
+Tool:    Claude Opus 4.7 (1M context)
+Used by: Colin Hanley
+Phase:   Feature Engineering
+
+PURPOSE:
+Replace raw 3P% with a volume-weighted variant to kill
+noise from low-attempt 0%/100% players.
+
+PROMPT:
+"for 3P%, I want to make it volume weighted
+(w attempt rate) instead of raw percentage,
+since there are players with 100% or 0% on
+rly low attempt"
+
+AI OUTPUT (Summary):
+Proposed two approaches: (1) simple product
+3P% × attempt_rate, or (2) shrinkage toward
+league mean with k = 25th-pct attempt rate.
+Recommended (2) for preserving % interpretation.
+
+YOUR ACTION:
+Adopted (2). Verified formula in Python,
+checked that extreme raw values shrink
+sensibly (Nesmith 82.5% stays high, 100%-
+on-1-attempt players shrink to league mean).
+
+FINAL RESULT:
+Implemented in src/preprocess.py engineer_features()
+as `three_pt_pct_vw`. Replaces raw column in
+feature matrix. Correlation with VORP improved
+from +0.023 to +0.033.
+────────────────────────────────────────────
+\end{verbatim}
+
+\textbf{To do before submission:} expand this appendix to cover every
+major session -- data cleaning, per-position K-means refactor, the
+frontend implementation, archetype-naming logic, the 2026 big-board
+pipeline, and the script-based repo conversion. The \texttt{process.MD}
+file in the repo root contains a chronological log of actions that can
+be converted into individual AI log entries in the format above.
+
+\end{document}

@@ -1,0 +1,41 @@
+# macOS junk
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+
+# LaTeX build artifacts
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.toc
+report/*.lof
+report/*.lot
+report/*.synctex.gz
+report/_minted*
+
+# Pre-submission cleanup — intermediate scraping artifacts and personal files
+# (delete these lines if you want to include them)
+process.MD
+NBA Data Cleaning - Sheet1.csv
+NBA Data Cleaning - Sheet1(1).csv
+NBA Data Cleaning - Sheet1(2).csv
+NBA Prospect Analysis - 2026 Prospects Prelim(11).csv
+clean_template.csv
+data_issues.csv
+CS+451+Project+Propsal.pdf
+final_project_requirements.pdf
+
+# Editor
+.vscode/
+.idea/
+*.swp
