@@ -21,7 +21,7 @@ On classification (positive VORP / negative VORP), XGBoost hits 56.5 %
 accuracy and 0.591 AUC. All metrics are on a strictly held-out 2019–2022 test
 set (temporal split — no leakage).
 
-**Deployment.** An editorial-style single-page dashboard (`site/index.html`)
+**Deployment.** An editorial-style single-page dashboard (`docs/index.html`)
 that ships the Ridge coefficients to the browser so readers can drive a live
 predictor. Also hosts a 2026 big board, a PCA scatter of all historical
 players, and a drawer with SHAP drivers + same-position comps for every
@@ -46,7 +46,7 @@ CS 451 Final Project/
 │   └── audit_data.py        data-quality auditor
 ├── models/                  .pkl artifacts (auto-created by train.py)
 ├── figures/                 EDA + modeling figures (auto-created)
-├── site/
+├── docs/
 │   ├── index.html           the dashboard
 │   └── data/                JSON exported by train.py
 └── notebooks/
@@ -58,9 +58,9 @@ CS 451 Final Project/
 ```bash
 pip install -r requirements.txt
 python src/train.py               # trains all models + writes every JSON + figure
-python src/generate_bigboard.py   # scores the 2026 class → site/data/bigboard.json
+python src/generate_bigboard.py   # scores the 2026 class → docs/data/bigboard.json
 python src/eda.py                 # (optional) regenerates EDA figures
-cd site && python -m http.server 8080
+cd docs && python -m http.server 8080
 # open http://localhost:8080
 ```
 
@@ -95,7 +95,7 @@ python src/generate_bigboard.py   # rerun so the board picks up new cluster IDs
 6. **Explain + export** — SHAP values per prospect, same-position nearest
    neighbours as "comps", Ridge coefficients and scaler parameters, plus a
    projection for every 2026-class player, all serialised to
-   `site/data/*.json` for the browser to consume.
+   `docs/data/*.json` for the browser to consume.
 
 ## Models saved to `models/`
 
@@ -109,7 +109,7 @@ python src/generate_bigboard.py   # rerun so the board picks up new cluster IDs
 | `scaler.pkl`      | `StandardScaler` fit on the 41-feature matrix    |
 | `kmeans.pkl`      | Dict `{position: {model, offset, k}}`            |
 
-## Front-end artefacts (`site/data/*.json`)
+## Front-end artefacts (`docs/data/*.json`)
 
 | File                  | What the dashboard uses it for                        |
 | --------------------- | ----------------------------------------------------- |

@@ -5,7 +5,7 @@ DATA_CSV = ROOT / "fixeddata.csv"
 BIGBOARD_CSV = ROOT / "2026class.csv"
 MODELS_DIR = ROOT / "models"
 FIGURES_DIR = ROOT / "figures"
-SITE_DATA_DIR = ROOT / "site" / "data"
+SITE_DATA_DIR = ROOT / "docs" / "data"
 
 SPLIT_YEAR = 2019
 

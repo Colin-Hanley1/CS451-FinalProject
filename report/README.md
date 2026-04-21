@@ -34,7 +34,7 @@ report/
       major session. See `../process.MD` for the chronological record.
 - [ ] Re-read Introduction and Discussion — prose is drafted but should
       be read in your own voice.
-- [ ] Verify all numeric claims against `../site/data/model_meta.json`.
+- [ ] Verify all numeric claims against `../docs/data/model_meta.json`.
 - [ ] Spot-check figures after recompiling (the figure numbers in the
       prose assume the 12-figure set produced by `src/eda.py` +
       `src/train.py`).
