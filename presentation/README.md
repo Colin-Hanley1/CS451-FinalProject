@@ -43,7 +43,7 @@ the folder is portable as a standalone zip).
 
 ## Demo cue on slide 9
 
-The demo is the dashboard (`site/index.html`). Open it in a second browser
+The demo is the dashboard (`docs/index.html`). Open it in a second browser
 tab before the talk starts. Rehearsed demo flow:
 1. Show the hero callout + ticker
 2. Scroll to the 2026 big board — click Cameron Boozer → drawer opens with
