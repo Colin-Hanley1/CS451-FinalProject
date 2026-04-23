@@ -8,7 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-
+/* ──────────────────────────────────────────────────────────── */
+/*  CS 451 — SLIDES. Press ←/→ to navigate. "P" to print.       */
+/* ──────────────────────────────────────────────────────────── */
 :root {
   --paper:    #f2ead9;
   --paper-hi: #f8f1e1;
@@ -98,6 +100,7 @@ p.copy { font-family: var(--sans); font-size: 20px; line-height: 1.5; color: var
 .stat .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--ink-3); }
 
+/* Pull quote */
 .pull {
   font-family: var(--serif);
   font-style: italic; font-weight: 400;
@@ -110,6 +113,7 @@ p.copy { font-family: var(--sans); font-size: 20px; line-height: 1.5; color: var
 .pull .hl { background: linear-gradient(transparent 68%, rgba(166,56,24,0.25) 68%); }
 .pull .ox { color: var(--ox); }
 
+/* Table */
 table.data { border-collapse: collapse; font-size: 20px; margin-top: 12px; }
 table.data th, table.data td { text-align: left; padding: 14px 22px; border-bottom: 1px solid var(--hairline); }
 table.data th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
@@ -120,6 +124,7 @@ table.data tr.lead-row td::after { content: ""; }
 table.data tr.lead-row td:first-child::after { content: " ◆"; color: var(--ox); font-size: 14px; }
 table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
+/* Lists */
 ul.stages { list-style: none; padding: 0; margin: 0; }
 ul.stages li {
   display: grid; grid-template-columns: 28px 200px 1fr; gap: 20px;
@@ -138,6 +143,7 @@ ul.bullets li {
 ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   letter-spacing: 0.06em; margin-right: 10px; }
 
+/* Archetypes grid */
 .arch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 24px; margin-top: 8px; }
 .arch-col h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px;
@@ -148,6 +154,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 .arch-col .row .name { color: var(--ink); font-weight: 500; }
 .arch-col .row .vorp { color: var(--ink-3); font-family: var(--mono); font-size: 13px; margin-left: auto; font-feature-settings: "tnum"; }
 
+/* Demo slide */
 .demo-cta {
   margin-top: auto;
   background: var(--ink); color: var(--paper);
@@ -164,6 +171,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   color: var(--paper); opacity: 0.85;
 }
 
+/* Title slide */
 .title-slide { justify-content: center; align-items: flex-start; padding: 80px 100px; }
 .title-slide .meta { font-family: var(--mono); font-size: 12px; letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--ink-3); margin-bottom: 24px; }
@@ -177,6 +185,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 }
 .title-slide .author b { color: var(--ox); font-weight: 500; }
 
+/* Footer */
 .slide-footer {
   position: absolute; bottom: 24px; left: 80px; right: 80px;
   display: flex; justify-content: space-between; align-items: center;
@@ -190,6 +199,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 }
 .slide-footer .dots span.on { background: var(--ox); }
 
+/* Controls */
 .controls {
   position: fixed; bottom: 16px; right: 20px;
   display: flex; gap: 8px; z-index: 10;
@@ -201,6 +211,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 }
 .controls button:hover { background: var(--ink); color: var(--paper); }
 
+/* Split layout: text column + figure column */
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -245,6 +256,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 .fig-frame.full { flex: 1; }
 .fig-frame.full img { max-height: 68vh; }
 
+/* Model-architecture grid (2×2 card layout) */
 .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; flex: 1; }
 .model-card {
   display: flex; flex-direction: column;
@@ -306,6 +318,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   padding: 0 4px;
 }
 
+/* Architecture pipeline flow */
 .flow { display: flex; flex-direction: column; gap: 0; flex: 1; justify-content: center; }
 .flow-step {
   display: grid; grid-template-columns: 130px 1fr;
@@ -339,11 +352,13 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   padding: 4px 0;
 }
 
+/* Small-multiples EDA grid */
 .sm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .sm-grid .fig-frame { box-shadow: 3px 3px 0 var(--ink); padding: 6px; }
 .sm-grid .fig-frame img { max-height: 28vh; }
 .sm-grid .fig-frame .cap { font-size: 9.5px; letter-spacing: 0.14em; margin-top: 4px; padding-top: 4px; }
 
+/* Print — one slide per page, no controls */
 @media print {
   .controls { display: none; }
   .slide {
@@ -369,6 +384,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 </head>
 <body>
 
+<!-- ── 1. TITLE ─────────────────────────────────────────────────── -->
 <section class="slide active title-slide" data-slide="1">
   <div class="meta">CS 451 · Introduction to Data Science · Final Project · Spring 2026</div>
   <h1 class="title">The Prospect <span class="amp">&amp;</span> Almanac</h1>
@@ -381,6 +397,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 2. THE QUESTION ──────────────────────────────────────────── -->
 <section class="slide" data-slide="2">
   <div class="slide-head">
     <span class="slide-no">§ 1 · The Question</span>
@@ -401,6 +418,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 3. THE DATA ──────────────────────────────────────────────── -->
 <section class="slide" data-slide="3">
   <div class="slide-head">
     <span class="slide-no">§ 2 · The Data</span>
@@ -430,12 +448,13 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 4. EDA (NEW) ─────────────────────────────────────────────── -->
 <section class="slide" data-slide="4">
   <div class="slide-head">
     <span class="slide-no">§ 3 · Exploratory Analysis</span>
     <span class="slide-kicker">Three views that shaped the pipeline</span>
   </div>
-  <h2 class="slide-title">What the raw data tells us</h2>
+  <h2 class="slide-title">What the raw data was telling us.</h2>
   <div class="body">
     <div class="sm-grid">
       <div class="fig-frame">
@@ -458,12 +477,13 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 5. FEATURE ENGINEERING ───────────────────────────────────── -->
 <section class="slide" data-slide="5">
   <div class="slide-head">
     <span class="slide-no">§ 4 · Feature Engineering</span>
     <span class="slide-kicker">13 new columns beyond the raw 28</span>
   </div>
-  <h2 class="slide-title">Feature engineering to account for positional differnces and shot volume</h2>
+  <h2 class="slide-title">Feature engineering to account for positional differences and shot volume</h2>
   <div class="split ratio-3-4">
     <div class="left">
       <ul class="bullets">
@@ -483,12 +503,13 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 6. MODELS + SPLIT ────────────────────────────────────────── -->
 <section class="slide" data-slide="6">
   <div class="slide-head">
     <span class="slide-no">§ 5 · Modeling</span>
     <span class="slide-kicker">Temporal split to prevent leakage</span>
   </div>
-  <h2 class="slide-title">Three regressors trained on temporally split training data</h2>
+  <h2 class="slide-title">Three regressors on a hold-out the future can't see.</h2>
   <div class="body">
     <ul class="stages">
       <li><span class="n">I</span><span class="h">Split at 2019</span>
@@ -505,16 +526,17 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 7. MODEL ARCHITECTURES (NEW) ─────────────────────────────── -->
 <section class="slide" data-slide="7">
   <div class="slide-head">
     <span class="slide-no">§ 6 · Model Architectures</span>
     <span class="slide-kicker">Structure + fitted hyperparameters after CV selection</span>
   </div>
-  <h2 class="slide-title">Closer look at the three regressors + K-means clustering</h2>
+  <h2 class="slide-title">Four models, up close.</h2>
   <div class="body">
     <div class="model-grid">
 
-
+      <!-- Ridge -->
       <div class="model-card">
         <div class="model-head">
           <span class="model-name">Ridge Regression</span>
@@ -532,7 +554,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
         </ul>
       </div>
 
-
+      <!-- XGBoost -->
       <div class="model-card">
         <div class="model-head">
           <span class="model-name">XGBoost Regressor</span>
@@ -553,7 +575,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
         </ul>
       </div>
 
-
+      <!-- MLP -->
       <div class="model-card">
         <div class="model-head">
           <span class="model-name">Multi-Layer Perceptron</span>
@@ -574,7 +596,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
         </ul>
       </div>
 
-
+      <!-- K-means -->
       <div class="model-card">
         <div class="model-head">
           <span class="model-name">Per-Position K-Means</span>
@@ -598,6 +620,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 8. RESULTS ───────────────────────────────────────────────── -->
 <section class="slide" data-slide="8">
   <div class="slide-head">
     <span class="slide-no">§ 7 · Results</span>
@@ -633,6 +656,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 9. WHAT MATTERS (SHAP) ───────────────────────────────────── -->
 <section class="slide" data-slide="9">
   <div class="slide-head">
     <span class="slide-no">§ 8 · What Matters</span>
@@ -663,6 +687,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 10. ARCHETYPES ───────────────────────────────────────────── -->
 <section class="slide" data-slide="10">
   <div class="slide-head">
     <span class="slide-no">§ 9 · Archetypes</span>
@@ -705,6 +730,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </p>
 </section>
 
+<!-- ── 11. 2026 BIG BOARD + DEMO ────────────────────────────────── -->
 <section class="slide" data-slide="11">
   <div class="slide-head">
     <span class="slide-no">§ 10 · 2026 Big Board</span>
@@ -729,6 +755,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 12. TECHNICAL ARCHITECTURE (NEW) ─────────────────────────── -->
 <section class="slide" data-slide="12">
   <div class="slide-head">
     <span class="slide-no">§ 11 · Technical Architecture</span>
@@ -805,6 +832,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
   </div>
 </section>
 
+<!-- ── 13. LIMITATIONS + FUTURE WORK ────────────────────────────── -->
 <section class="slide" data-slide="13">
   <div class="slide-head">
     <span class="slide-no">§ 12 · Limitations &amp; Next Steps</span>
