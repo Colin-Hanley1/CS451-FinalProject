@@ -370,7 +370,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
 <body>
 
 <section class="slide active title-slide" data-slide="1">
-  <div class="meta">CS 451 · Introduction to Data Science · Final Project · Spring 2026</div>
+  <div class="meta">CS 451 · Data Science · Final Project · Spring 2026</div>
   <h1 class="title">The Prospect <span class="amp">&amp;</span> Almanac</h1>
   <div class="sub">
     Projecting four-year NBA value from college statistics and
@@ -722,10 +722,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
         <tr><td class="num">5</td><td class="name">Brayden Burries</td><td>Arizona</td><td>G</td><td class="num">+4.23</td><td class="num">83%</td></tr>
       </tbody>
     </table>
-    <div class="demo-cta">
-      <div class="lh">Live demo &rarr; <span style="color: var(--ox)">open the almanac.</span></div>
-      <div class="rh">site/index.html &middot; sliders &middot; drawer &middot; PCA scatter</div>
-    </div>
+
   </div>
 </section>
 
@@ -734,7 +731,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
     <span class="slide-no">§ 11 · Technical Architecture</span>
     <span class="slide-kicker">How a CSV becomes a dashboard</span>
   </div>
-  <h2 class="slide-title">One pipeline, four layers, one command.</h2>
+  <h2 class="slide-title">Pipeline Overview</h2>
   <div class="body">
     <div class="flow">
       <div class="flow-step">
@@ -769,7 +766,7 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
           <div class="d">
             <code>src/train.py</code> &mdash; temporal split, 3 regressors + 2 classifiers
             with <code>RandomizedSearchCV</code>, SHAP <code>TreeExplainer</code>,
-            per-position K-means, global PCA. One command, ~2 min on a laptop.
+            per-position K-means, global PCA.
           </div>
         </div>
       </div>
@@ -784,20 +781,6 @@ ul.bullets li b { color: var(--ox); font-family: var(--mono); font-size: 17px;
             (5 files) &middot; <code>figures/*.png</code> (12 plots).
             <code>bigboard.json</code> regenerated separately via
             <code>generate_bigboard.py</code> without retraining.
-          </div>
-        </div>
-      </div>
-      <div class="arrow">▼</div>
-
-      <div class="flow-step">
-        <div class="stage-label">V · Deploy</div>
-        <div class="stage-body">
-          <div class="h">Static single-page dashboard</div>
-          <div class="d">
-            <code>site/index.html</code> &mdash; vanilla HTML/CSS/JS, no framework.
-            Ridge coefficients + scaler in <code>model_meta.json</code> drive
-            the in-browser live predictor; SHAP/comps are read from
-            <code>prospects.json</code>. Total deploy bundle: <b>~700 KB</b>.
           </div>
         </div>
       </div>

@@ -1188,20 +1188,9 @@ table.ptable tbody td.name .meta {
 
   <section class="lede">
     <div class="copy rise">
-      <p class="kicker">FROM THE EDITOR &nbsp;·&nbsp; A NOTE ON METHOD</p>
+      <p class="kicker">ABSTRACT</p>
       <p class="dropcap">
-        Every June a thousand scouts, executives, and coaches convene to guess which
-        twenty-year-olds will become professional basketball players. They watch tape,
-        they read measurements, they argue about motor. This study asks a narrower and
-        more tractable question: given only what a prospect did in college &mdash; and what he was
-        thought of in high school &mdash; how much of his four-year NBA value can be recovered
-        by a machine?
-      </p>
-      <p>
-        The answer, for now, is modest. A gradient-boosted tree explains about a fifth of
-        the variance in four-year VORP out of sample. The remaining four-fifths is the
-        reason teams still hire scouts. What follows is an accounting of what the model
-        saw, where it agreed with history, and where it dissents.
+    We ask how much of an NBA player's early career impact, measured in this case by four-year cumulative Value Over Replacement Player (VORP), can be recovered through modeling their collegiate statistics and high school recruiting information. We assembled a dataset of 1042 college players drafted into the NBA from 2000-2022, collecting their college statistics and engineering them (computing position-relative z-scores, volume-weighted shooting metrics and a defensive versatility metric). Using this dataset, we trained three regression models (Ridge, XG Boost, and an MLP) to predict four-year cumulative VORP. The XGBoost model yielded the best results, with an MAE of 1.67 VORP, $R^2$ of .202, and an AUC of .591 on a binarised VORP classification task (positive vs negative). In addition, we used unsupervised K-means modeling within position groups, which identified eight player archetypes whose mean cumulative VORP differs by factors of ten. From this modeling, we can conclude that the value of purely statistical college scouting using our current methods is bounded. Future work might include processing strength of schedule faced and more in-depth physical measurement data.
       </p>
     </div>
     <aside class="callout rise d1" id="callout-card">
@@ -1245,8 +1234,7 @@ table.ptable tbody td.name .meta {
       <div>
         <p class="predictor-note">
           The Ridge model is interpretable enough that we can ship its weights to your browser
-          and let you drive the inputs yourself. Move the sliders; the prediction updates
-          immediately. Stats you don't specify are held at the dataset mean.
+          and let you drive the inputs yourself. The sliders are initialized at positional mean, move them to change the prospect's outlook
         </p>
 
         <form class="predictor-form" id="predictor-form" autocomplete="off" onsubmit="return false">
