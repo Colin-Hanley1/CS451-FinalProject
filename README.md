@@ -1,6 +1,6 @@
 # NBA Draft Prospect Predictor
 ### CS 451 — End-to-End Data Science Final Project
-
+Demo can be found here: https://colin-hanley1.github.io/CS451-FinalProject/
 **Problem.** NBA teams invest millions scouting draft prospects. This project
 asks: how much of a player's four-year NBA value (VORP) can be recovered
 from college box-score statistics and high-school recruiting rank alone?
