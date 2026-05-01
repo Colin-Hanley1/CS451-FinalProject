@@ -21,7 +21,15 @@ report/*.toc
 report/*.lof
 report/*.lot
 report/*.synctex.gz
+report/*.fdb_latexmk
+report/*.fls
 report/_minted*
+
+# Stale frontend (renamed to docs/ for GitHub Pages)
+site/
+
+# Tooling
+.claude/
 
 # Pre-submission cleanup — intermediate scraping artifacts and personal files
 # (delete these lines if you want to include them)
